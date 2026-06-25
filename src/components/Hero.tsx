@@ -99,12 +99,11 @@ export default function Hero() {
               fontFamily: "'Satoshi', sans-serif",
               fontWeight: 900,
               fontSize: "clamp(52px,8vw,120px)",
-              color: "#ffffff",
+              color: "#1D6FF2",
               letterSpacing: "-0.03em",
               padding: "0 0.2em",
               borderRadius: "0.25em",
               background: "rgba(29,111,242,0.08)",
-              color: "#1D6FF2",
             }}>
               Build
             </span>
@@ -134,12 +133,11 @@ export default function Hero() {
               fontFamily: "'Satoshi', sans-serif",
               fontWeight: 900,
               fontSize: "clamp(52px,8vw,120px)",
-              color: "#0B0B0B",
+              color: "#06B6D4",
               letterSpacing: "-0.03em",
               padding: "0 0.2em",
               borderRadius: "0.25em",
               background: "rgba(6,182,212,0.08)",
-              color: "#06B6D4",
             }}>
               Grow.
             </span>
