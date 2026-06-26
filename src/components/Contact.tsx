@@ -134,12 +134,13 @@ export default function Contact() {
 
             <div className="space-y-5">
               {[
-                { icon: "✦", text: "vyralmedia@gmail.com" },
+                { icon: "✦", text: "info@vyralmedia.net" },
                 { icon: "✦", text: "+92 311 768 9887" },
+                { icon: "✦", text: "Sultan Plaza, Ghanta Ghar Chowk, Sialkot Cantt" },
                 { icon: "✦", text: "Response within 24 hours" },
               ].map((item) => (
-                <div key={item.text} className="flex items-center gap-3">
-                  <span className="text-[#1D6FF2] text-xs">{item.icon}</span>
+                <div key={item.text} className="flex items-start gap-3">
+                  <span className="text-[#1D6FF2] text-xs mt-0.5">{item.icon}</span>
                   <span className="text-[#0B0B0B]/60 text-sm font-['Inter']">{item.text}</span>
                 </div>
               ))}

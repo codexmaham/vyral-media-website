@@ -48,6 +48,14 @@ const services = [
     color: "#1A3A2A",
     bg: "#F0FFF5",
   },
+  {
+    num: "06",
+    title: "Hiring Lead Generation",
+    description:
+      "We generate qualified hiring leads for companies looking to recruit top talent. Our inhouse customer support team screens, filters, and delivers only the right candidates — saving your HR team time and cost.",
+    color: "#3A1A3A",
+    bg: "#FDF0FF",
+  },
 ];
 
 export default function Services() {

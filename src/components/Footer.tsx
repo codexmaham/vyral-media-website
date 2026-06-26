@@ -71,11 +71,11 @@ export default function Footer() {
               </svg>
             </a>
           </div>
-          <a href="mailto:vyralmedia@gmail.com" style={{ marginTop: "1.5rem", display: "block", color: "#1D6FF2", fontFamily: "'Inter', sans-serif", fontSize: "1.125rem", width: "fit-content" }}
+          <a href="mailto:info@vyralmedia.net" style={{ marginTop: "1.5rem", display: "block", color: "#1D6FF2", fontFamily: "'Inter', sans-serif", fontSize: "1.125rem", width: "fit-content" }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.textDecoration = "underline"; }}
             onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.textDecoration = "none"; }}
           >
-            vyralmedia@gmail.com
+            info@vyralmedia.net
           </a>
         </div>
 
@@ -90,9 +90,15 @@ export default function Footer() {
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem", fontFamily: "'Inter', sans-serif", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "0.75rem" }}>
               Driven by Data, Powered by Ideas
             </p>
-            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.875rem", fontFamily: "'Inter', sans-serif", lineHeight: 1.625, maxWidth: "20rem" }}>
+            <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.875rem", fontFamily: "'Inter', sans-serif", lineHeight: 1.625, maxWidth: "20rem", marginBottom: "1rem" }}>
               Premium digital agency building brands that people remember and businesses that grow.
             </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+              <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.75rem", fontFamily: "'Inter', sans-serif" }}>Founded by Muttahir Imtiaz</p>
+              <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.75rem", fontFamily: "'Inter', sans-serif" }}>Sultan Plaza, Ghanta Ghar Chowk, Sialkot Cantt</p>
+              <a href="mailto:info@vyralmedia.net" style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.75rem", fontFamily: "'Inter', sans-serif" }}>info@vyralmedia.net</a>
+              <a href="tel:+923117689887" style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.75rem", fontFamily: "'Inter', sans-serif" }}>+92 311 768 9887</a>
+            </div>
           </div>
 
           {Object.entries(footerLinks).map(([category, links]) => (

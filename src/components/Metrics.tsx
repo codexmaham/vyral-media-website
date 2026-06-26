@@ -7,10 +7,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 const metrics = [
-  { value: 120, suffix: "+", label: "Projects Delivered", description: "Across 15+ industries worldwide" },
-  { value: 98, suffix: "%", label: "Client Satisfaction", description: "Based on post-project surveys" },
-  { value: 4, suffix: "×", label: "Average ROI", description: "Return on marketing investment" },
-  { value: 15, suffix: "M+", label: "Revenue Generated", description: "For our clients in the last 2 years" },
+  { value: 50, suffix: "+", label: "Brands Built", description: "In the past 4 years across multiple industries" },
+  { value: 13, suffix: "", label: "Team Members", description: "Inhouse & remote specialists working for you" },
+  { value: 145, suffix: "K+", label: "Ad Spend Managed", description: "$100K Meta Ads + $45K Google Ads in 2026" },
+  { value: 4, suffix: " Yrs", label: "In Business", description: "Consistently delivering results since day one" },
 ];
 
 function Counter({ value, suffix, triggered }: { value: number; suffix: string; triggered: boolean }) {

@@ -15,21 +15,21 @@ const reasons = [
   },
   {
     num: "02",
-    title: "Design With Purpose",
+    title: "$145K+ Ad Spend Managed",
     description:
-      "Beautiful doesn't mean effective. Every design decision is tied to a business outcome - from color psychology to conversion-optimized layouts.",
+      "In 2026 alone, we managed over $100,000 on Meta Ads and $45,000 on Google Ads — delivering measurable ROI for brands across real estate, F&B, healthcare, and e-commerce.",
   },
   {
     num: "03",
-    title: "Built For Conversion",
+    title: "Hiring Lead Generation",
     description:
-      "We obsess over metrics. A/B testing, heatmaps, funnel analysis - we iterate until your numbers reflect your ambition.",
+      "Beyond marketing, we generate qualified hiring leads for companies like Fazal Din Pharma. Our inhouse customer support team filters and qualifies every lead before it reaches you.",
   },
   {
     num: "04",
-    title: "Long Term Partnership",
+    title: "13-Person Expert Team",
     description:
-      "We don\u2019t disappear after launch. Our retainer clients get ongoing optimization, reporting, and strategic support as their business evolves.",
+      "A full-service team of 13 specialists — inhouse and remote — covering performance marketing, videography, web development, SEO, AI automation, and customer support.",
   },
 ];
 
