@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 
 // Clients with logos — files must be placed in public/logos/
 const clients = [
@@ -19,6 +20,40 @@ const clients = [
   { name: "Rahim Impex", logo: null, invert: false, h: 48 },
   { name: "Guy Leroy", logo: null, invert: false, h: 48 },
 ];
+
+type Client = typeof clients[0];
+
+function ClientLogo({ client }: { client: Client }) {
+  const [errored, setErrored] = useState(false);
+
+  if (!client.logo || errored) {
+    return (
+      <span style={{
+        fontFamily: "'Satoshi', sans-serif",
+        fontWeight: 700,
+        fontSize: "0.9rem",
+        color: "rgba(255,255,255,0.55)",
+        whiteSpace: "nowrap",
+        letterSpacing: "0.02em",
+        textTransform: "uppercase",
+      }}>
+        {client.name}
+      </span>
+    );
+  }
+
+  return (
+    <div style={{ position: "relative", height: 48, width: 120, flexShrink: 0 }}>
+      <Image
+        src={client.logo}
+        alt={client.name}
+        fill
+        onError={() => setErrored(true)}
+        style={{ objectFit: "contain", filter: "brightness(0) invert(1)", opacity: 0.8 }}
+      />
+    </div>
+  );
+}
 
 export default function MarqueeBar() {
   return (
@@ -73,37 +108,7 @@ export default function MarqueeBar() {
                   justifyContent: "center",
                   height: "72px",
                 }}>
-                  {client.logo ? (
-                    <div style={{
-                      position: "relative",
-                      height: 48,
-                      width: 120,
-                      flexShrink: 0,
-                    }}>
-                      <Image
-                        src={client.logo}
-                        alt={client.name}
-                        fill
-                        style={{
-                          objectFit: "contain",
-                          filter: "brightness(0) invert(1)",
-                          opacity: 0.8,
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <span style={{
-                      fontFamily: "'Satoshi', sans-serif",
-                      fontWeight: 700,
-                      fontSize: "0.95rem",
-                      color: "rgba(255,255,255,0.6)",
-                      whiteSpace: "nowrap",
-                      letterSpacing: "0.02em",
-                      textTransform: "uppercase",
-                    }}>
-                      {client.name}
-                    </span>
-                  )}
+                  <ClientLogo client={client} />
                 </div>
 
                 {/* Divider */}
