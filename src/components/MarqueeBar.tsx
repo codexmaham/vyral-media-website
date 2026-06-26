@@ -10,7 +10,6 @@ const clients = [
   { name: "Rowdyz", logo: "/logos/rowdyz.png", invert: false, h: 52 },
   { name: "Fazal Din's Pharma", logo: "/logos/fazal-din.png", invert: false, h: 44 },
   { name: "Tax Sale Guy", logo: "/logos/tax-sale-guy.png", invert: false, h: 64 },
-  { name: "Vyral Media", logo: "/logos/vyral-media.png", invert: false, h: 40 },
   { name: "Vynixo", logo: "/logos/vynixo.png", invert: false, h: 36 },
   { name: "Yemek", logo: "/logos/yemek.png", invert: false, h: 60 },
   { name: "Al Noor Town", logo: null, invert: false, h: 48 },
