@@ -16,7 +16,7 @@ const clients = [
 
 export default function MarqueeBar() {
   return (
-    <section style={{
+    <section id="marquee" style={{
       background: "linear-gradient(135deg, #0a0a0a 0%, #0f1a2e 50%, #0a0a0a 100%)",
       overflow: "hidden",
       borderTop: "1px solid rgba(29,111,242,0.15)",

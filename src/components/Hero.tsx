@@ -2,6 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -10,16 +13,17 @@ export default function Hero() {
   // Intro animation
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // ── Intro timeline ──
       const tl = gsap.timeline({ delay: 0.2 });
 
       tl.fromTo(
         ".hero-line",
-        { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: 0.9, ease: "power4.out", stagger: 0.12 }
+        { opacity: 0, y: 60, skewY: 2 },
+        { opacity: 1, y: 0, skewY: 0, duration: 1, ease: "power4.out", stagger: 0.14 }
       );
       tl.fromTo(
         ".hero-sub",
-        { opacity: 0, y: 20 },
+        { opacity: 0, y: 24 },
         { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
         0.6
       );
@@ -35,6 +39,49 @@ export default function Hero() {
         { opacity: 1, scale: 1, duration: 1, ease: "power3.out", stagger: 0.08 },
         0.3
       );
+      tl.fromTo(
+        ".hero-stats",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.08 },
+        0.9
+      );
+
+      // ── Scroll parallax: heading drifts up + fades as you scroll ──
+      gsap.to(".hero-content", {
+        y: -80,
+        opacity: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top",
+          end: "40% top",
+          scrub: 1,
+        },
+      });
+
+      // ── Decorative elements scroll at different speeds ──
+      gsap.to(".hero-deco-slow", {
+        y: -40,
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 2,
+        },
+      });
+
+      gsap.to(".hero-deco-fast", {
+        y: -120,
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1.5,
+        },
+      });
+
     }, containerRef);
 
     return () => ctx.revert();
@@ -48,13 +95,13 @@ export default function Hero() {
     >
       {/* ── Decorative SVG elements ── */}
 
-      {/* Squiggly line — left */}
-      <svg className="hero-deco" style={{ position: "absolute", left: "3%", top: "25%", opacity: 0 }} width="60" height="140" viewBox="0 0 60 140" fill="none">
+      {/* Squiggly line — left (slow parallax) */}
+      <svg className="hero-deco hero-deco-slow" style={{ position: "absolute", left: "3%", top: "25%", opacity: 0 }} width="60" height="140" viewBox="0 0 60 140" fill="none">
         <path d="M30 5 C50 25, 10 45, 30 65 C50 85, 10 105, 30 135" stroke="rgba(29,111,242,0.2)" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
       </svg>
 
-      {/* Dotted arc — right */}
-      <svg className="hero-deco" style={{ position: "absolute", right: "4%", top: "18%", opacity: 0 }} width="110" height="90" viewBox="0 0 110 90" fill="none">
+      {/* Dotted arc — right (fast parallax) */}
+      <svg className="hero-deco hero-deco-fast" style={{ position: "absolute", right: "4%", top: "18%", opacity: 0 }} width="110" height="90" viewBox="0 0 110 90" fill="none">
         {Array.from({ length: 24 }).map((_, i) => {
           const row = Math.floor(i / 6);
           const col = i % 6;
@@ -65,24 +112,24 @@ export default function Hero() {
         })}
       </svg>
 
-      {/* Small dot — top right */}
-      <div className="hero-deco" style={{ position: "absolute", top: "14%", right: "20%", width: 12, height: 12, borderRadius: "50%", background: "#1D6FF2", opacity: 0 }} />
+      {/* Small dot — top right (fast) */}
+      <div className="hero-deco hero-deco-fast" style={{ position: "absolute", top: "14%", right: "20%", width: 12, height: 12, borderRadius: "50%", background: "#1D6FF2", opacity: 0 }} />
 
-      {/* Small dot — bottom left */}
-      <div className="hero-deco" style={{ position: "absolute", bottom: "22%", left: "18%", width: 8, height: 8, borderRadius: "50%", background: "#06B6D4", opacity: 0 }} />
+      {/* Small dot — bottom left (slow) */}
+      <div className="hero-deco hero-deco-slow" style={{ position: "absolute", bottom: "22%", left: "18%", width: 8, height: 8, borderRadius: "50%", background: "#06B6D4", opacity: 0 }} />
 
-      {/* Diagonal stripes — bottom left */}
-      <svg className="hero-deco" style={{ position: "absolute", bottom: "8%", left: "2%", opacity: 0 }} width="72" height="56" viewBox="0 0 72 56" fill="none">
+      {/* Diagonal stripes — bottom left (slow) */}
+      <svg className="hero-deco hero-deco-slow" style={{ position: "absolute", bottom: "8%", left: "2%", opacity: 0 }} width="72" height="56" viewBox="0 0 72 56" fill="none">
         {[0,1,2,3,4].map((i) => (
           <line key={i} x1={i*14} y1="0" x2={i*14+28} y2="56" stroke="#06B6D4" strokeWidth="2.5" strokeLinecap="round" opacity="0.5"/>
         ))}
       </svg>
 
-      {/* Circle outline — right center */}
-      <div className="hero-deco" style={{ position: "absolute", right: "-40px", top: "38%", width: 200, height: 200, borderRadius: "50%", border: "1px solid rgba(29,111,242,0.15)", opacity: 0 }} />
+      {/* Circle outline — right center (fast) */}
+      <div className="hero-deco hero-deco-fast" style={{ position: "absolute", right: "-40px", top: "38%", width: 200, height: 200, borderRadius: "50%", border: "1px solid rgba(29,111,242,0.15)", opacity: 0 }} />
 
-      {/* ── Content ── */}
-      <div ref={headingRef} style={{ position: "relative", zIndex: 10, padding: "7rem clamp(20px,5vw,80px) 5rem", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
+      {/* ── Content (fades + drifts up on scroll) ── */}
+      <div className="hero-content" ref={headingRef} style={{ position: "relative", zIndex: 10, padding: "7rem clamp(20px,5vw,80px) 5rem", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
 
 
         {/* Headline */}
@@ -174,10 +221,10 @@ export default function Hero() {
         {/* Stats bar */}
         <div style={{ marginTop: "4rem", paddingTop: "2rem", borderTop: "1px solid rgba(217,217,217,0.6)", display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "2rem" }} className="hero-stats">
           {[
-            { num: "120+", label: "Projects Delivered" },
-            { num: "15+", label: "Industries Served" },
-            { num: "98%", label: "Client Satisfaction" },
-            { num: "4×", label: "Average ROI" },
+            { num: "50+", label: "Brands Built" },
+            { num: "4 Yrs", label: "In Business" },
+            { num: "13", label: "Team Members" },
+            { num: "$145K+", label: "Ad Spend Managed" },
           ].map((stat) => (
             <div key={stat.label} className="hero-cta" style={{ opacity: 0, textAlign: "center" }}>
               <div style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 900, fontSize: "1.875rem", color: "#0B0B0B", letterSpacing: "-0.03em" }}>{stat.num}</div>
@@ -187,11 +234,20 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div style={{ position: "absolute", bottom: "2rem", left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem" }}>
-        <div style={{ width: 1, height: 48, background: "linear-gradient(to bottom, transparent, rgba(11,11,11,0.2))" }} />
+      {/* Scroll indicator — click to go to next section */}
+      <div
+        onClick={() => document.querySelector("#marquee")?.scrollIntoView({ behavior: "smooth" })}
+        style={{ position: "absolute", bottom: "2rem", left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}
+      >
+        <div style={{ width: 1, height: 48, background: "linear-gradient(to bottom, transparent, rgba(11,11,11,0.3))", animation: "scrollPulse 1.8s ease-in-out infinite" }} />
         <span className="label" style={{ color: "rgba(11,11,11,0.3)" }}>Scroll</span>
       </div>
+      <style>{`
+        @keyframes scrollPulse {
+          0%, 100% { opacity: 0.4; transform: scaleY(1); }
+          50% { opacity: 1; transform: scaleY(1.15); }
+        }
+      `}</style>
 
       <style>{`
         @media (min-width: 768px) {
