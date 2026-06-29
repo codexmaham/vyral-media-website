@@ -118,7 +118,7 @@ export default function Work() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="work" style={{ background: "#0B0B0B", padding: "6rem 0" }}>
+    <section ref={sectionRef} id="work" style={{ background: "#0B0B0B", padding: "6rem 0", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
       <div className="max-w-[1400px] mx-auto" style={{ paddingLeft: "clamp(20px,4vw,40px)", paddingRight: "clamp(20px,4vw,40px)" }}>
 
         {/* Header */}

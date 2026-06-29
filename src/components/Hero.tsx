@@ -8,78 +8,68 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const headingRef = useRef<HTMLDivElement>(null);
 
-  // Intro animation
   useEffect(() => {
+    // Ensure page starts at top on load
+    window.history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+
     const ctx = gsap.context(() => {
-      // ── Intro timeline ──
+      // Set initial hidden state via GSAP (not inline styles)
+      gsap.set(".hero-line", { opacity: 0, y: 60, skewY: 2 });
+
+      // ── Intro animation ──
       const tl = gsap.timeline({ delay: 0.2 });
 
-      tl.fromTo(
+      tl.to(
         ".hero-line",
-        { opacity: 0, y: 60, skewY: 2 },
         { opacity: 1, y: 0, skewY: 0, duration: 1, ease: "power4.out", stagger: 0.14 }
-      );
-      tl.fromTo(
-        ".hero-sub",
-        { opacity: 0, y: 24 },
-        { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" },
-        0.6
-      );
-      tl.fromTo(
-        ".hero-cta",
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.1 },
-        0.75
-      );
-      tl.fromTo(
-        ".hero-deco",
-        { opacity: 0, scale: 0.8 },
-        { opacity: 1, scale: 1, duration: 1, ease: "power3.out", stagger: 0.08 },
-        0.3
-      );
-      tl.fromTo(
-        ".hero-stats",
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.08 },
-        0.9
-      );
+      )
+      // one-time 3D flip on Build after lines appear
+      .to(".hero-build-word", {
+        rotationY: 360,
+        duration: 1.2,
+        ease: "power2.inOut",
+      }, "-=0.3");
 
-      // ── Scroll parallax: heading drifts up + fades as you scroll ──
-      gsap.to(".hero-content", {
-        y: -80,
-        opacity: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "40% top",
-          scrub: 1,
-        },
-      });
+      // ── Scroll: pin hero, zoom "Build" to center then blast off ──
+      const buildEl = containerRef.current?.querySelector(".hero-build-word") as HTMLElement | null;
+      const buildRect = buildEl?.getBoundingClientRect();
+      const vCX = window.innerWidth / 2;
+      const vCY = window.innerHeight / 2;
+      const elCX = buildRect ? buildRect.left + buildRect.width / 2 : vCX;
+      const elCY = buildRect ? buildRect.top + buildRect.height / 2 : vCY;
+      const deltaX = vCX - elCX;
+      const deltaY = vCY - elCY;
 
-      // ── Decorative elements scroll at different speeds ──
-      gsap.to(".hero-deco-slow", {
-        y: -40,
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: 2,
-        },
-      });
-
-      gsap.to(".hero-deco-fast", {
-        y: -120,
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: 1.5,
-        },
+      ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top top",
+        end: "+=160%",
+        pin: true,
+        anticipatePin: 1,
+        scrub: 1.2,
+        animation: gsap.timeline()
+          // fade everything except Build word
+          .fromTo(".hero-fade", { opacity: 1, y: 0 }, { opacity: 0, y: -40, duration: 0.4, ease: "power2.in" }, 0)
+          // move Build to viewport center + scale up
+          .to(".hero-build-word", {
+            x: deltaX,
+            y: deltaY,
+            scale: 2.5,
+            transformOrigin: "center center",
+            duration: 0.4,
+            ease: "power2.inOut",
+          }, 0.15)
+          // 3D spin + blast off
+          .to(".hero-build-word", {
+            rotationY: 720,
+            scale: 18,
+            opacity: 0,
+            transformOrigin: "center center",
+            duration: 0.55,
+            ease: "power3.in",
+          }, 0.5),
       });
 
     }, containerRef);
@@ -91,170 +81,62 @@ export default function Hero() {
     <section
       ref={containerRef}
       id="hero"
-      style={{ background: "#ffffff", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center", position: "relative", overflow: "hidden" }}
+      style={{
+        background: "#060d1a",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        position: "relative",
+        overflow: "hidden",
+        perspective: "1200px",
+      }}
     >
-      {/* ── Decorative SVG elements ── */}
-
-      {/* Squiggly line — left (slow parallax) */}
-      <svg className="hero-deco hero-deco-slow" style={{ position: "absolute", left: "3%", top: "25%", opacity: 0 }} width="60" height="140" viewBox="0 0 60 140" fill="none">
-        <path d="M30 5 C50 25, 10 45, 30 65 C50 85, 10 105, 30 135" stroke="rgba(29,111,242,0.2)" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-      </svg>
-
-      {/* Dotted arc — right (fast parallax) */}
-      <svg className="hero-deco hero-deco-fast" style={{ position: "absolute", right: "4%", top: "18%", opacity: 0 }} width="110" height="90" viewBox="0 0 110 90" fill="none">
-        {Array.from({ length: 24 }).map((_, i) => {
-          const row = Math.floor(i / 6);
-          const col = i % 6;
-          const cx = 10 + col * 18;
-          const cy = 10 + row * 24;
-          const r = Math.sqrt((cx - 55) ** 2 + (cy - 90) ** 2);
-          return r < 100 ? <circle key={i} cx={cx} cy={cy} r="2.5" fill="#0B0B0B" opacity="0.18" /> : null;
-        })}
-      </svg>
-
-      {/* Small dot — top right (fast) */}
-      <div className="hero-deco hero-deco-fast" style={{ position: "absolute", top: "14%", right: "20%", width: 12, height: 12, borderRadius: "50%", background: "#1D6FF2", opacity: 0 }} />
-
-      {/* Small dot — bottom left (slow) */}
-      <div className="hero-deco hero-deco-slow" style={{ position: "absolute", bottom: "22%", left: "18%", width: 8, height: 8, borderRadius: "50%", background: "#06B6D4", opacity: 0 }} />
-
-      {/* Diagonal stripes — bottom left (slow) */}
-      <svg className="hero-deco hero-deco-slow" style={{ position: "absolute", bottom: "8%", left: "2%", opacity: 0 }} width="72" height="56" viewBox="0 0 72 56" fill="none">
-        {[0,1,2,3,4].map((i) => (
-          <line key={i} x1={i*14} y1="0" x2={i*14+28} y2="56" stroke="#06B6D4" strokeWidth="2.5" strokeLinecap="round" opacity="0.5"/>
-        ))}
-      </svg>
-
-      {/* Circle outline — right center (fast) */}
-      <div className="hero-deco hero-deco-fast" style={{ position: "absolute", right: "-40px", top: "38%", width: 200, height: 200, borderRadius: "50%", border: "1px solid rgba(29,111,242,0.15)", opacity: 0 }} />
-
-      {/* ── Content (fades + drifts up on scroll) ── */}
-      <div className="hero-content" ref={headingRef} style={{ position: "relative", zIndex: 10, padding: "7rem clamp(20px,5vw,80px) 5rem", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
-
+      <div style={{ position: "relative", zIndex: 10, padding: "7rem clamp(20px,5vw,80px) 5rem", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
 
         {/* Headline */}
         <div style={{ marginBottom: "3rem" }}>
-          {/* Line 1 */}
-          <div className="hero-line" style={{ opacity: 0, display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "0.3em", lineHeight: 1.05, marginBottom: "0.1em" }}>
-            <span style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 900, fontSize: "clamp(52px,8vw,120px)", color: "#0B0B0B", letterSpacing: "-0.03em" }}>
-              We
+
+          {/* Line 1: We Build */}
+          <div className="hero-line" style={{ lineHeight: 1, marginBottom: "0.05em", textAlign: "center" }}>
+            <span className="hero-fade" style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 900, fontSize: "clamp(64px,10vw,148px)", color: "#ffffff", letterSpacing: "-0.04em" }}>
+              We{" "}
             </span>
-            {/* Highlighted word */}
-            <span style={{
-              position: "relative",
+            <span className="hero-build-word" style={{
               display: "inline-block",
               fontFamily: "'Satoshi', sans-serif",
               fontWeight: 900,
-              fontSize: "clamp(52px,8vw,120px)",
-              color: "#1D6FF2",
-              letterSpacing: "-0.03em",
-              padding: "0 0.2em",
-              borderRadius: "0.25em",
-              background: "rgba(29,111,242,0.08)",
+              fontSize: "clamp(64px,10vw,148px)",
+              letterSpacing: "-0.04em",
+              background: "linear-gradient(135deg,#1D6FF2 0%,#06B6D4 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              transformStyle: "preserve-3d",
             }}>
               Build
             </span>
           </div>
 
-          {/* Line 2 */}
-          <div className="hero-line" style={{ opacity: 0, display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "0.3em", lineHeight: 1.05, marginBottom: "0.1em" }}>
-            {/* Arrow icon */}
-            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "clamp(47px,6.3vw,90px)", height: "clamp(47px,6.3vw,90px)", borderRadius: "50%", border: "3px solid #0B0B0B", flexShrink: 0 }}>
-              <svg viewBox="0 0 24 24" fill="none" style={{ width: "40%", height: "40%" }}>
-                <path d="M5 12h14M13 6l6 6-6 6" stroke="#0B0B0B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </span>
-            <span style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 900, fontSize: "clamp(52px,8vw,120px)", color: "#0B0B0B", letterSpacing: "-0.03em" }}>
+          {/* Line 2: Brands */}
+          <div className="hero-line hero-fade" style={{ lineHeight: 1, marginBottom: "0.05em", textAlign: "center" }}>
+            <span style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 900, fontSize: "clamp(64px,10vw,148px)", color: "#ffffff", letterSpacing: "-0.04em" }}>
               Brands
             </span>
           </div>
 
-          {/* Line 3 */}
-          <div className="hero-line" style={{ opacity: 0, display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", gap: "0.3em", lineHeight: 1.05 }}>
-            <span style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 900, fontSize: "clamp(52px,8vw,120px)", color: "#0B0B0B", letterSpacing: "-0.03em" }}>
+          {/* Line 3: That Grow */}
+          <div className="hero-line hero-fade" style={{ lineHeight: 1, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5em", flexWrap: "wrap" }}>
+            <span style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 900, fontSize: "clamp(64px,10vw,148px)", color: "rgba(255,255,255,0.18)", letterSpacing: "-0.04em" }}>
               That
             </span>
-            <span style={{
-              position: "relative",
-              display: "inline-block",
-              fontFamily: "'Satoshi', sans-serif",
-              fontWeight: 900,
-              fontSize: "clamp(52px,8vw,120px)",
-              color: "#06B6D4",
-              letterSpacing: "-0.03em",
-              padding: "0 0.2em",
-              borderRadius: "0.25em",
-              background: "rgba(6,182,212,0.08)",
-            }}>
+            <span style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 900, fontSize: "clamp(64px,10vw,148px)", color: "#ffffff", letterSpacing: "-0.04em" }}>
               Grow.
             </span>
           </div>
         </div>
 
-        {/* CTA */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "2rem", alignItems: "center" }} className="hero-bottom">
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", justifyContent: "center" }}>
-            <a
-              href="#contact"
-              onClick={(e) => { e.preventDefault(); document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" }); }}
-              className="hero-cta"
-              style={{ display: "inline-flex", alignItems: "center", gap: "0.75rem", background: "#1D6FF2", color: "#ffffff", fontFamily: "'Satoshi', sans-serif", fontWeight: 600, padding: "1rem 1.75rem", borderRadius: "9999px", transition: "background 0.3s", fontSize: "0.95rem" }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "#0B0B0B"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "#1D6FF2"; }}
-            >
-              Start Your Project
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </a>
-            <a
-              href="#work"
-              onClick={(e) => { e.preventDefault(); document.querySelector("#work")?.scrollIntoView({ behavior: "smooth" }); }}
-              className="hero-cta"
-              style={{ display: "inline-flex", alignItems: "center", gap: "0.75rem", border: "1px solid rgba(11,11,11,0.2)", color: "#0B0B0B", fontFamily: "'Satoshi', sans-serif", fontWeight: 600, padding: "1rem 1.75rem", borderRadius: "9999px", transition: "all 0.3s", fontSize: "0.95rem" }}
-              onMouseEnter={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = "#0B0B0B"; el.style.color = "#ffffff"; }}
-              onMouseLeave={(e) => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = "transparent"; el.style.color = "#0B0B0B"; }}
-            >
-              View Our Work
-            </a>
-          </div>
-        </div>
-
-        {/* Stats bar */}
-        <div style={{ marginTop: "4rem", paddingTop: "2rem", borderTop: "1px solid rgba(217,217,217,0.6)", display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "2rem" }} className="hero-stats">
-          {[
-            { num: "50+", label: "Brands Built" },
-            { num: "4 Yrs", label: "In Business" },
-            { num: "13", label: "Team Members" },
-            { num: "$145K+", label: "Ad Spend Managed" },
-          ].map((stat) => (
-            <div key={stat.label} className="hero-cta" style={{ opacity: 0, textAlign: "center" }}>
-              <div style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 900, fontSize: "1.875rem", color: "#0B0B0B", letterSpacing: "-0.03em" }}>{stat.num}</div>
-              <div className="label" style={{ color: "rgba(11,11,11,0.4)", marginTop: "0.25rem" }}>{stat.label}</div>
-            </div>
-          ))}
-        </div>
       </div>
 
-      {/* Scroll indicator — click to go to next section */}
-      <div
-        onClick={() => document.querySelector("#marquee")?.scrollIntoView({ behavior: "smooth" })}
-        style={{ position: "absolute", bottom: "2rem", left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem", cursor: "pointer" }}
-      >
-        <div style={{ width: 1, height: 48, background: "linear-gradient(to bottom, transparent, rgba(11,11,11,0.3))", animation: "scrollPulse 1.8s ease-in-out infinite" }} />
-        <span className="label" style={{ color: "rgba(11,11,11,0.3)" }}>Scroll</span>
-      </div>
-      <style>{`
-        @keyframes scrollPulse {
-          0%, 100% { opacity: 0.4; transform: scaleY(1); }
-          50% { opacity: 1; transform: scaleY(1.15); }
-        }
-      `}</style>
-
-      <style>{`
-        @media (min-width: 768px) {
-          .hero-stats { grid-template-columns: repeat(4,1fr) !important; }
-          .hero-bottom { flex-direction: column !important; align-items: center !important; }
-        }
-      `}</style>
     </section>
   );
 }

@@ -7,11 +7,10 @@ import MarqueeBar from "@/components/MarqueeBar";
 import Services from "@/components/Services";
 import WhyUs from "@/components/WhyUs";
 import Process from "@/components/Process";
-import Work from "@/components/Work";
 import Metrics from "@/components/Metrics";
 import TechStack from "@/components/TechStack";
 import Testimonials from "@/components/Testimonials";
-import VideoPortfolio from "@/components/VideoPortfolio";
+import Portfolio from "@/components/VideoPortfolio";
 import MeetTeam from "@/components/MeetTeam";
 import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
@@ -34,15 +33,14 @@ export default function Home() {
       {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
       <div style={{ opacity: loading ? 0 : 1, transition: "opacity 0.3s ease" }}>
         <Hero />
+        <Portfolio />
         <MarqueeBar />
         <Services />
         <WhyUs />
         <Process />
-        <Work />
         <Metrics />
         <TechStack />
         <Testimonials />
-        <VideoPortfolio />
         <MeetTeam />
         <FAQ />
         <Contact />

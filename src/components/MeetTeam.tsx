@@ -41,7 +41,7 @@ export default function MeetTeam() {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
   return (
-    <section id="team" style={{ backgroundColor: "#ffffff", padding: "6rem 0" }}>
+    <section id="team" style={{ backgroundColor: "#ffffff", padding: "6rem 0", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
       <div className="max-w-[1400px] mx-auto" style={{ paddingLeft: "clamp(20px,4vw,40px)", paddingRight: "clamp(20px,4vw,40px)" }}>
         <div style={{ marginBottom: "4rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>

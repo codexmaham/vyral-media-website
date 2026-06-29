@@ -4,115 +4,169 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 
 export default function LoadingScreen({ onComplete }: { onComplete: () => void }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const progressVal = useRef(0);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLImageElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const container = containerRef.current;
-    const canvas = canvasRef.current;
-    if (!container || !canvas) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) { setTimeout(onComplete, 600); return; }
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const overlay = overlayRef.current;
+    const logo = logoRef.current;
+    const glow = glowRef.current;
+    const ring = ringRef.current;
+    if (!overlay || !logo || !glow || !ring) return;
 
-    const SIZE = 320;
-    canvas.width = SIZE;
-    canvas.height = SIZE;
+    // Initial states
+    gsap.set(logo, { scale: 5, opacity: 0, filter: "blur(32px) brightness(2)" });
+    gsap.set(glow, { opacity: 0, scale: 0.4 });
+    gsap.set(ring, { opacity: 0, scale: 0.3 });
 
-    const img = new window.Image();
-    img.src = "/vyral-icon.png";
+    const tl = gsap.timeline();
 
-    img.onload = () => {
-      // Initial draw: greyscale
-      draw(0);
+    // Phase 1: shape "forms" — zooms in from huge to normal, blur dissolves
+    tl.to(logo, {
+      scale: 1,
+      opacity: 1,
+      filter: "blur(0px) brightness(1)",
+      duration: 1.4,
+      ease: "expo.out",
+      delay: 0.15,
+    });
 
-      // Entrance animation
-      gsap.fromTo(canvas,
-        { scale: 0.7, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.7, ease: "back.out(1.7)", delay: 0.1 }
-      );
+    // Glow blooms as logo forms
+    tl.to(glow, {
+      opacity: 1,
+      scale: 1,
+      duration: 1.1,
+      ease: "power2.out",
+    }, "-=1.0");
 
-      // Progress tick
-      const interval = setInterval(() => {
-        progressVal.current += Math.random() * 3 + 1.5;
-        if (progressVal.current >= 100) {
-          progressVal.current = 100;
-          clearInterval(interval);
-          draw(100);
+    // Subtle ring pulse
+    tl.to(ring, {
+      opacity: 0.5,
+      scale: 1,
+      duration: 0.7,
+      ease: "power2.out",
+    }, "-=0.6");
 
-          setTimeout(() => {
-            gsap.to(canvas, { scale: 1.1, opacity: 0, duration: 0.4, ease: "power3.in" });
-            gsap.to(container, {
-              clipPath: "inset(0 0 100% 0)",
-              duration: 0.65,
-              delay: 0.25,
-              ease: "power4.inOut",
-              onComplete,
-            });
-          }, 400);
-          return;
-        }
-        draw(Math.min(progressVal.current, 100));
-      }, 55);
+    tl.to(ring, {
+      opacity: 0,
+      scale: 1.6,
+      duration: 0.9,
+      ease: "power2.out",
+    }, "-=0.1");
+
+    // Phase 2: gentle float loop
+    tl.call(() => {
+      gsap.to(logo, {
+        y: -12,
+        duration: 2.4,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+      gsap.to(glow, {
+        scale: 1.1,
+        opacity: 0.8,
+        duration: 2.4,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+      });
+    });
+
+    // Hold 1.6s then exit
+    tl.to({}, { duration: 1.6 });
+
+    tl.call(() => {
+      gsap.killTweensOf([logo, glow]);
+
+      // Exit: logo zooms close (into screen) + fades
+      gsap.to(logo, {
+        scale: 4,
+        opacity: 0,
+        filter: "blur(20px) brightness(2)",
+        duration: 0.7,
+        ease: "power3.in",
+      });
+      gsap.to(glow, { opacity: 0, scale: 2, duration: 0.6, ease: "power3.in" });
+
+      // Overlay wipes up — cinematic curtain
+      gsap.to(overlay, {
+        clipPath: "inset(0 0 100% 0)",
+        duration: 0.75,
+        delay: 0.35,
+        ease: "power4.inOut",
+        onComplete,
+      });
+    });
+
+    return () => {
+      tl.kill();
+      gsap.killTweensOf([logo, glow, ring, overlay]);
     };
-
-    function draw(pct: number) {
-      if (!ctx) return;
-      ctx.clearRect(0, 0, SIZE, SIZE);
-
-      // 1. Draw greyscale logo (full)
-      ctx.save();
-      ctx.filter = "grayscale(1) brightness(0.35)";
-      ctx.drawImage(img, 0, 0, SIZE, SIZE);
-      ctx.restore();
-
-      // 2. Clip from bottom upward based on pct, draw color logo inside
-      if (pct > 0) {
-        const fillY = SIZE - (SIZE * pct) / 100; // top of the fill band
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(0, fillY, SIZE, SIZE - fillY);
-        ctx.clip();
-        ctx.drawImage(img, 0, 0, SIZE, SIZE);
-        ctx.restore();
-
-        // 3. Draw a glowing horizontal "wave" line at the fill boundary
-        const lineY = fillY;
-        const lineGrad = ctx.createLinearGradient(0, 0, SIZE, 0);
-        lineGrad.addColorStop(0, "rgba(29,111,242,0)");
-        lineGrad.addColorStop(0.3, "rgba(29,111,242,0.9)");
-        lineGrad.addColorStop(0.5, "rgba(6,182,212,1)");
-        lineGrad.addColorStop(0.7, "rgba(124,58,237,0.9)");
-        lineGrad.addColorStop(1, "rgba(124,58,237,0)");
-
-        ctx.save();
-        ctx.globalAlpha = 0.85;
-        ctx.strokeStyle = lineGrad;
-        ctx.lineWidth = 3;
-        ctx.shadowColor = "#06B6D4";
-        ctx.shadowBlur = 12;
-        ctx.beginPath();
-        ctx.moveTo(0, lineY);
-        ctx.lineTo(SIZE, lineY);
-        ctx.stroke();
-        ctx.restore();
-      }
-    }
-
-    return () => { /* cleanup handled by clearInterval above */ };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onComplete]);
+  }, []);
 
   return (
     <div
-      ref={containerRef}
-      className="fixed inset-0 z-[10000] bg-[#0B0B0B] flex items-center justify-center"
-      style={{ clipPath: "inset(0 0 0% 0)" }}
+      ref={overlayRef}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 10000,
+        background: "#07070f",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        clipPath: "inset(0 0 0% 0)",
+        overflow: "hidden",
+      }}
     >
-      <canvas
-        ref={canvasRef}
-        style={{ opacity: 0, imageRendering: "crisp-edges" }}
+      {/* Ambient glow */}
+      <div
+        ref={glowRef}
+        style={{
+          position: "absolute",
+          width: "clamp(400px, 60vw, 800px)",
+          height: "clamp(400px, 60vw, 800px)",
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(29,111,242,0.22) 0%, rgba(124,58,237,0.14) 40%, rgba(6,182,212,0.05) 70%, transparent 100%)",
+          filter: "blur(50px)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Pulse ring */}
+      <div
+        ref={ringRef}
+        style={{
+          position: "absolute",
+          width: "clamp(260px, 36vw, 460px)",
+          height: "clamp(260px, 36vw, 460px)",
+          borderRadius: "50%",
+          border: "1px solid rgba(29,111,242,0.4)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Logo */}
+      <img
+        ref={logoRef}
+        src="/vyral-3d-logo.png"
+        alt="Vyral Media"
+        style={{
+          width: "clamp(320px, 50vw, 650px)",
+          height: "auto",
+          display: "block",
+          willChange: "transform, opacity, filter",
+          mixBlendMode: "screen",
+          position: "relative",
+          zIndex: 2,
+        }}
       />
     </div>
   );

@@ -140,7 +140,7 @@ export default function TechStack() {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
   return (
-    <section style={{ backgroundColor: "#0B0B0B", padding: "6rem 0" }}>
+    <section style={{ backgroundColor: "#0B0B0B", padding: "6rem 0", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
       <div className="max-w-[1400px] mx-auto" style={{ paddingLeft: "clamp(20px,4vw,40px)", paddingRight: "clamp(20px,4vw,40px)" }}>
 
         {/* Header */}

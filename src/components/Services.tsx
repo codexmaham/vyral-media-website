@@ -80,8 +80,8 @@ export default function Services() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="services" className="bg-white pt-20 pb-8">
-      <div className="max-w-[1400px] mx-auto px-6 md:px-10">
+    <section ref={sectionRef} id="services" className="bg-white pt-20 pb-8" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <div className="max-w-[1400px] mx-auto" style={{ paddingLeft: "clamp(20px,4vw,40px)", paddingRight: "clamp(20px,4vw,40px)" }}>
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div>
             <div className="flex items-center gap-3 mb-5">

@@ -83,7 +83,7 @@ export default function Testimonials() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="bg-white py-24 md:py-32 overflow-hidden">
+    <section ref={sectionRef} className="bg-white py-24 md:py-32 overflow-hidden" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
       <div className="max-w-[1400px] mx-auto px-6 md:px-10 mb-16">
         <div className="flex items-center gap-3 mb-5">
           <div className="w-6 h-px bg-[#1D6FF2]" />

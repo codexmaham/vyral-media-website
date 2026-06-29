@@ -51,7 +51,7 @@ export default function Navigation() {
             className="flex items-center gap-2 z-10"
           >
             <Image src="/vyral-icon.png" alt="Vyral Media" width={40} height={40} className="object-contain" />
-            <span className="font-['Satoshi'] font-black text-lg tracking-[-0.03em] text-[#0B0B0B] hidden sm:block">
+            <span className="font-['Satoshi'] font-black text-lg tracking-[-0.03em] hidden sm:block" style={{ color: scrolled ? "#0B0B0B" : "#ffffff" }}>
               VYRAL<span style={{ background: "linear-gradient(135deg,#1D6FF2,#06B6D4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>.</span>
             </span>
           </a>
@@ -63,7 +63,8 @@ export default function Navigation() {
                 key={link.href}
                 href={link.href}
                 onClick={(e) => { e.preventDefault(); scrollTo(link.href); }}
-                className="label text-[#0B0B0B]/60 hover:text-[#0B0B0B] transition-colors duration-200"
+                className="label transition-colors duration-200"
+                style={{ color: scrolled ? "rgba(11,11,11,0.6)" : "rgba(255,255,255,0.7)" }}
               >
                 {link.label}
               </a>
@@ -75,7 +76,8 @@ export default function Navigation() {
             <a
               href="#contact"
               onClick={(e) => { e.preventDefault(); scrollTo("#contact"); }}
-              className="hidden md:flex items-center gap-2 border border-[#0B0B0B]/25 text-[#0B0B0B] label px-5 py-3 rounded-full hover:bg-[#0B0B0B] hover:text-white hover:border-[#0B0B0B] transition-all duration-300"
+              className="hidden md:flex items-center gap-2 label px-5 py-3 rounded-full transition-all duration-300"
+              style={{ border: `1px solid ${scrolled ? "rgba(11,11,11,0.25)" : "rgba(255,255,255,0.35)"}`, color: scrolled ? "#0B0B0B" : "#ffffff" }}
             >
               Book a Call
             </a>
@@ -86,9 +88,9 @@ export default function Navigation() {
               className="md:hidden flex flex-col gap-1.5 w-6 cursor-pointer"
               aria-label="Toggle menu"
             >
-              <span className={`h-px bg-[#0B0B0B] transition-all duration-300 origin-center ${menuOpen ? "rotate-45 translate-y-[10px] w-6" : "w-6"}`} />
-              <span className={`h-px bg-[#0B0B0B] transition-all duration-300 ${menuOpen ? "opacity-0 w-0" : "w-4"}`} />
-              <span className={`h-px bg-[#0B0B0B] transition-all duration-300 origin-center ${menuOpen ? "-rotate-45 -translate-y-[10px] w-6" : "w-6"}`} />
+              <span className={`h-px transition-all duration-300 origin-center ${menuOpen ? "rotate-45 translate-y-[10px] w-6" : "w-6"}`} style={{ background: scrolled ? "#0B0B0B" : "#ffffff" }} />
+              <span className={`h-px transition-all duration-300 ${menuOpen ? "opacity-0 w-0" : "w-4"}`} style={{ background: scrolled ? "#0B0B0B" : "#ffffff" }} />
+              <span className={`h-px transition-all duration-300 origin-center ${menuOpen ? "-rotate-45 -translate-y-[10px] w-6" : "w-6"}`} style={{ background: scrolled ? "#0B0B0B" : "#ffffff" }} />
             </button>
           </div>
         </div>

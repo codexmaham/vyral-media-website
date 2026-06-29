@@ -107,7 +107,7 @@ export default function FAQ() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="bg-white py-24 md:py-32">
+    <section ref={sectionRef} className="bg-white py-24 md:py-32" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
       <div className="max-w-[1400px] mx-auto px-6 md:px-10">
         <div className="grid md:grid-cols-2 gap-16 md:gap-24">
           <div>

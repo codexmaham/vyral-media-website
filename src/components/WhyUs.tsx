@@ -69,7 +69,7 @@ export default function WhyUs() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="why-us" style={{ backgroundColor: "#0B0B0B", paddingTop: "6rem", paddingBottom: "8rem" }}>
+    <section ref={sectionRef} id="why-us" style={{ backgroundColor: "#0B0B0B", paddingTop: "6rem", paddingBottom: "8rem", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
       <div className="max-w-[1400px] mx-auto" style={{ paddingLeft: "clamp(20px,4vw,40px)", paddingRight: "clamp(20px,4vw,40px)" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "4rem" }} className="md-grid-2">
           {/* Left heading */}
