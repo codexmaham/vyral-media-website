@@ -4,88 +4,71 @@ import { useEffect, useRef } from "react";
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const dotRef = useRef<HTMLDivElement>(null);
+  const pos = useRef({ x: -200, y: -200 });
+  const current = useRef({ x: -200, y: -200 });
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const cursor = cursorRef.current;
-    const dot = dotRef.current;
-    if (!cursor || !dot) return;
+    // Only on desktop
+    if (window.matchMedia("(pointer: coarse)").matches) return;
 
-    let mouseX = 0;
-    let mouseY = 0;
-    let curX = 0;
-    let curY = 0;
-    let raf: number;
+    document.body.style.cursor = "none";
 
-    const onMouseMove = (e: MouseEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-
-      // Dot follows instantly
-      dot.style.left = `${mouseX}px`;
-      dot.style.top = `${mouseY}px`;
+    const onMove = (e: MouseEvent) => {
+      pos.current = { x: e.clientX, y: e.clientY };
     };
 
-    const animate = () => {
-      curX += (mouseX - curX) * 0.08;
-      curY += (mouseY - curY) * 0.08;
-      cursor.style.left = `${curX}px`;
-      cursor.style.top = `${curY}px`;
-      raf = requestAnimationFrame(animate);
+    const loop = () => {
+      current.current.x += (pos.current.x - current.current.x) * 0.12;
+      current.current.y += (pos.current.y - current.current.y) * 0.12;
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = `translate(${current.current.x}px, ${current.current.y}px) rotate(-30deg)`;
+      }
+      rafRef.current = requestAnimationFrame(loop);
     };
 
-    raf = requestAnimationFrame(animate);
-    window.addEventListener("mousemove", onMouseMove);
-
-    // Interaction states
-    const onMouseEnterLink = () => {
-      cursor.classList.add("scale-[2.5]", "border-[#1D6FF2]", "bg-[#1D6FF2]/10");
-      dot.classList.add("opacity-0");
-    };
-    const onMouseLeaveLink = () => {
-      cursor.classList.remove("scale-[2.5]", "border-[#1D6FF2]", "bg-[#1D6FF2]/10");
-      dot.classList.remove("opacity-0");
-    };
-
-    const links = document.querySelectorAll("a, button, [data-cursor]");
-    links.forEach((el) => {
-      el.addEventListener("mouseenter", onMouseEnterLink);
-      el.addEventListener("mouseleave", onMouseLeaveLink);
-    });
-
-    // Observer for dynamic links
-    const observer = new MutationObserver(() => {
-      const newLinks = document.querySelectorAll("a, button, [data-cursor]");
-      newLinks.forEach((el) => {
-        el.removeEventListener("mouseenter", onMouseEnterLink);
-        el.removeEventListener("mouseleave", onMouseLeaveLink);
-        el.addEventListener("mouseenter", onMouseEnterLink);
-        el.addEventListener("mouseleave", onMouseLeaveLink);
-      });
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener("mousemove", onMove, { passive: true });
+    rafRef.current = requestAnimationFrame(loop);
 
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("mousemove", onMouseMove);
-      observer.disconnect();
+      document.body.style.cursor = "";
+      window.removeEventListener("mousemove", onMove);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
   return (
-    <>
-      {/* Large trailing circle */}
-      <div
-        ref={cursorRef}
-        className="fixed pointer-events-none z-[9999] w-10 h-10 rounded-full border border-[#0B0B0B]/40 -translate-x-1/2 -translate-y-1/2 transition-[transform,border-color,background-color] duration-300 ease-out mix-blend-multiply"
-        style={{ left: -100, top: -100 }}
-      />
-      {/* Small instant dot */}
-      <div
-        ref={dotRef}
-        className="fixed pointer-events-none z-[9999] w-1.5 h-1.5 rounded-full bg-[#1D6FF2] -translate-x-1/2 -translate-y-1/2 transition-opacity duration-200"
-        style={{ left: -100, top: -100 }}
-      />
-    </>
+    <div
+      ref={cursorRef}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        zIndex: 99999,
+        pointerEvents: "none",
+        willChange: "transform",
+        marginLeft: -2,
+        marginTop: -2,
+      }}
+    >
+      <svg
+        width="32"
+        height="52"
+        viewBox="0 0 32 52"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.6))" }}
+      >
+        {/* Stick */}
+        <rect x="13" y="10" width="4" height="40" rx="2" fill="white" />
+        {/* Tip glow */}
+        <circle cx="15" cy="10" r="6" fill="#1D6FF2" opacity="0.3" />
+        <circle cx="15" cy="10" r="4" fill="#1D6FF2" />
+        <circle cx="15" cy="10" r="2" fill="white" />
+        {/* Handle grip lines */}
+        <rect x="11" y="42" width="8" height="2" rx="1" fill="rgba(255,255,255,0.4)" />
+        <rect x="11" y="46" width="8" height="2" rx="1" fill="rgba(255,255,255,0.3)" />
+      </svg>
+    </div>
   );
 }
