@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 const clients = [
   { name: "Client 1", logo: "/logos/Asset 33x.png" },
@@ -34,9 +35,11 @@ function ClientLogo({ client }: { client: typeof clients[0] }) {
   }
 
   return (
-    <img
+    <Image
       src={client.logo}
       alt={client.name}
+      width={200}
+      height={80}
       onError={() => setErrored(true)}
       style={{ height: 80, width: "auto", maxWidth: 200, objectFit: "contain", opacity: 0.9 }}
     />

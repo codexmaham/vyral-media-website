@@ -15,10 +15,13 @@ export default function WhatsAppButton() {
       href="https://wa.me/923117689887"
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-[200] w-14 h-14 rounded-full bg-[#25D366] flex items-center justify-center shadow-lg transition-all duration-500 hover:scale-110 group"
+      className="fixed z-[999] w-14 h-14 rounded-full bg-[#25D366] flex items-center justify-center shadow-lg transition-all duration-500 hover:scale-110 group"
       style={{
+        bottom: "5.5rem",
+        right: "1.25rem",
         opacity: visible ? 1 : 0,
         transform: `scale(${visible ? 1 : 0.5})`,
+        pointerEvents: visible ? "auto" : "none",
       }}
       aria-label="Chat on WhatsApp"
     >
