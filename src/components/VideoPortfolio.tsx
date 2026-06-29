@@ -130,12 +130,12 @@ export default function Portfolio() {
         style={{
           paddingLeft: "clamp(20px,4vw,40px)",
           paddingRight: "clamp(20px,4vw,40px)",
-          paddingTop: "5rem",
-          paddingBottom: "4rem",
+          paddingTop: "2rem",
+          paddingBottom: "2rem",
         }}
       >
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", marginBottom: "3rem" }}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", marginBottom: "1.5rem" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
               <div style={{ width: 24, height: 1, background: "rgba(255,255,255,0.3)" }} />

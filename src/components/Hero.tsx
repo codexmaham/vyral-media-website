@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import LightRays from "./LightRays";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -92,6 +93,21 @@ export default function Hero() {
         perspective: "1200px",
       }}
     >
+      {/* Light Rays background */}
+      <LightRays
+        raysOrigin="top-center"
+        raysColor="#4da6ff"
+        raysSpeed={1.5}
+        lightSpread={1.8}
+        rayLength={3.5}
+        fadeDistance={2.5}
+        saturation={1.0}
+        followMouse={true}
+        mouseInfluence={0.15}
+        noiseAmount={0.02}
+        distortion={0.04}
+        pulsating={true}
+      />
       <div style={{ position: "relative", zIndex: 10, padding: "7rem clamp(20px,5vw,80px) 5rem", maxWidth: "1400px", margin: "0 auto", width: "100%" }}>
 
         {/* Headline */}

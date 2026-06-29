@@ -1,11 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useEffect } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
+import { useState, useRef } from "react";
+import AnimatedList from "./AnimatedList";
 
 const services = [
   {
@@ -14,7 +10,7 @@ const services = [
     description:
       "Data-driven campaigns across Google, Meta, and TikTok that maximize ROI. From funnel architecture to creative testing - we scale what works and cut what doesn't.",
     color: "#1D6FF2",
-    bg: "#FFF0F0",
+    bg: "#EFF4FF",
   },
   {
     num: "02",
@@ -29,150 +25,282 @@ const services = [
     title: "Videography & Motion",
     description:
       "Cinematic commercial videos, social-first content, and motion graphics that capture attention in seconds. From concept to final cut - in-house.",
-    color: "#4A3728",
-    bg: "#FDF6F0",
+    color: "#C2410C",
+    bg: "#FFF7ED",
   },
   {
     num: "04",
     title: "Web Development",
     description:
       "High-performance websites and web apps built with Next.js, React, and modern tooling. Pixel-perfect design implementation with Core Web Vitals in mind.",
-    color: "#0F2C4A",
-    bg: "#F0F4FF",
+    color: "#1D6FF2",
+    bg: "#EFF4FF",
   },
   {
     num: "05",
     title: "AI Solutions & Automation",
     description:
       "Custom AI workflows, chatbots, and automation pipelines using OpenAI, Claude, n8n, and Make. We make AI practical and profitable for your business.",
-    color: "#1A3A2A",
-    bg: "#F0FFF5",
+    color: "#059669",
+    bg: "#ECFDF5",
   },
   {
     num: "06",
     title: "Hiring Lead Generation",
     description:
-      "We generate qualified hiring leads for companies looking to recruit top talent. Our inhouse customer support team screens, filters, and delivers only the right candidates — saving your HR team time and cost.",
-    color: "#3A1A3A",
-    bg: "#FDF0FF",
+      "We generate qualified hiring leads for companies looking to recruit top talent. Our in-house customer support team screens, filters, and delivers only the right candidates.",
+    color: "#7C3AED",
+    bg: "#F5F3FF",
   },
 ];
 
 export default function Services() {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const active = services[selectedIndex];
   const sectionRef = useRef<HTMLElement>(null);
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from(".service-row", {
-        opacity: 0,
-        y: 30,
-        stagger: 0.08,
-        duration: 0.7,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 70%",
-        },
-      });
-    }, sectionRef);
-    return () => ctx.revert();
-  }, []);
 
   return (
-    <section ref={sectionRef} id="services" className="bg-white pt-20 pb-8" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-      <div className="max-w-[1400px] mx-auto" style={{ paddingLeft: "clamp(20px,4vw,40px)", paddingRight: "clamp(20px,4vw,40px)" }}>
+    <section
+      ref={sectionRef}
+      id="services"
+      className="pt-20 pb-16"
+      style={{ backgroundColor: "#0B0B0B", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}
+    >
+      <div
+        className="max-w-[1400px] mx-auto w-full"
+        style={{ paddingLeft: "clamp(20px,4vw,40px)", paddingRight: "clamp(20px,4vw,40px)" }}
+      >
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div>
             <div className="flex items-center gap-3 mb-5">
               <div className="w-6 h-px bg-[#1D6FF2]" />
-              <span className="label text-[#0B0B0B]/40">What We Do</span>
+              <span className="label text-white/40">What We Do</span>
             </div>
-            <h2 className="h-large text-[#0B0B0B]">Services</h2>
+            <h2 className="h-large text-white">Services</h2>
           </div>
-          <p className="max-w-xs text-[#0B0B0B]/50 leading-relaxed font-['Inter'] text-sm">
+          <p className="max-w-xs text-white/50 leading-relaxed font-['Inter'] text-sm">
             End-to-end digital solutions that cover every touchpoint of your brand.
           </p>
         </div>
 
-        <div className="border-t border-[#D9D9D9]">
-          {services.map((service, i) => (
+        {/* Two-column layout */}
+        <div className="flex flex-col md:flex-row gap-12 md:gap-20 items-start">
+          {/* Left: animated list */}
+          <div className="w-full md:w-1/2">
+            <AnimatedList
+              items={services.map((s) => s.title)}
+              onItemSelect={(_, index) => setSelectedIndex(index)}
+              showGradients={true}
+              enableArrowNavigation={true}
+              displayScrollbar={false}
+              initialSelectedIndex={0}
+              renderItem={(item, index, selected) => {
+                const service = services[index];
+                return (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "1.25rem 1.5rem",
+                      borderRadius: 16,
+                      background: selected ? service.bg : "transparent",
+                      border: `1px solid ${selected ? "transparent" : "rgba(255,255,255,0.1)"}`,
+                      transition: "all 0.25s ease",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                      <span
+                        style={{
+                          fontFamily: "'Satoshi', sans-serif",
+                          fontWeight: 900,
+                          fontSize: "0.65rem",
+                          letterSpacing: "0.12em",
+                          color: selected ? service.color : "rgba(0,0,0,0.3)",
+                          transition: "color 0.25s ease",
+                        }}
+                      >
+                        {service.num}
+                      </span>
+                      <span
+                        style={{
+                          fontFamily: "'Satoshi', sans-serif",
+                          fontWeight: 800,
+                          fontSize: "clamp(1rem, 1.8vw, 1.35rem)",
+                          color: selected ? service.color : "rgba(255,255,255,0.85)",
+                          letterSpacing: "-0.02em",
+                          transition: "color 0.25s ease",
+                        }}
+                      >
+                        {item}
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: "50%",
+                        background: selected ? service.color : "transparent",
+                        border: `1px solid ${selected ? service.color : "rgba(0,0,0,0.15)"}`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                        transition: "all 0.25s ease",
+                      }}
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        style={{
+                          transform: selected ? "rotate(-45deg)" : "rotate(0deg)",
+                          transition: "transform 0.25s ease",
+                          stroke: selected ? "white" : "#0B0B0B",
+                        }}
+                      >
+                        <path d="M3 8h10M9 4l4 4-4 4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                  </div>
+                );
+              }}
+            />
+          </div>
+
+          {/* Right: sticky detail panel */}
+          <div className="w-full md:w-1/2 md:sticky md:top-32">
+            {/* Sticky note card */}
             <div
-              key={service.num}
-              className="service-row group relative border-b border-[#D9D9D9] cursor-pointer overflow-hidden"
-              onMouseEnter={() => setActiveIndex(i)}
-              onMouseLeave={() => setActiveIndex(null)}
+              style={{
+                borderRadius: "4px 24px 24px 24px",
+                background: active.bg,
+                position: "relative",
+                minHeight: 340,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                boxShadow: "6px 6px 0px rgba(0,0,0,0.08), 0 20px 60px rgba(0,0,0,0.08)",
+                transition: "background 0.3s ease",
+              }}
             >
-              {/* Hover bg */}
+              {/* Top pin strip */}
               <div
-                className="absolute inset-0 transition-opacity duration-400"
                 style={{
-                  backgroundColor: service.bg,
-                  opacity: activeIndex === i ? 1 : 0,
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 6,
+                  borderRadius: "4px 24px 0 0",
+                  background: active.color,
+                  transition: "background 0.3s ease",
                 }}
               />
 
-              <div className="relative z-10 flex items-center justify-between py-6 md:py-8 gap-6">
-                <div className="flex items-center gap-6 md:gap-12 flex-1 min-w-0">
-                  <span
-                    className="label shrink-0 transition-colors duration-300"
-                    style={{ color: activeIndex === i ? service.color : "#0B0B0B" + "50" }}
-                  >
-                    {service.num}
-                  </span>
-                  <h3
-                    className="font-['Satoshi'] font-black text-[#0B0B0B] tracking-[-0.02em] transition-all duration-300"
-                    style={{ fontSize: "clamp(20px, 3vw, 40px)" }}
-                  >
-                    {service.title}
-                  </h3>
-                </div>
+              {/* Folded corner */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  right: 0,
+                  width: 0,
+                  height: 0,
+                  borderStyle: "solid",
+                  borderWidth: "0 0 40px 40px",
+                  borderColor: `transparent transparent rgba(0,0,0,0.1) transparent`,
+                }}
+              />
 
-                {/* Description - appears on hover */}
-                <p
-                  className="hidden md:block max-w-xs text-[#0B0B0B]/60 text-sm leading-relaxed font-['Inter'] transition-all duration-400"
+              {/* Content */}
+              <div style={{ padding: "2.5rem 2.5rem 0", marginTop: "0.5rem" }}>
+                <span
                   style={{
-                    opacity: activeIndex === i ? 1 : 0,
-                    transform: activeIndex === i ? "translateX(0)" : "translateX(20px)",
+                    fontFamily: "'Satoshi', sans-serif",
+                    fontWeight: 900,
+                    fontSize: "0.6rem",
+                    letterSpacing: "0.2em",
+                    color: active.color,
+                    display: "block",
+                    marginBottom: "1rem",
+                    transition: "color 0.3s ease",
+                    opacity: 0.8,
                   }}
                 >
-                  {service.description}
+                  {active.num}
+                </span>
+                <h3
+                  style={{
+                    fontFamily: "'Satoshi', sans-serif",
+                    fontWeight: 900,
+                    fontSize: "clamp(1.6rem, 3vw, 2.4rem)",
+                    color: "#0B0B0B",
+                    letterSpacing: "-0.03em",
+                    lineHeight: 1.05,
+                    margin: 0,
+                  }}
+                >
+                  {active.title}
+                </h3>
+              </div>
+
+              {/* Divider */}
+              <div style={{ margin: "2rem 2.5rem", height: 1, background: "rgba(0,0,0,0.08)" }} />
+
+              {/* Description */}
+              <div style={{ padding: "0 2.5rem 2.5rem" }}>
+                <p
+                  style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: "0.925rem",
+                    color: "rgba(0,0,0,0.55)",
+                    lineHeight: 1.8,
+                    margin: 0,
+                  }}
+                >
+                  {active.description}
                 </p>
 
+                {/* Tag */}
                 <div
-                  className="shrink-0 w-10 h-10 rounded-full border border-[#0B0B0B]/20 flex items-center justify-center transition-all duration-300"
                   style={{
-                    backgroundColor: activeIndex === i ? service.color : "transparent",
-                    borderColor: activeIndex === i ? service.color : undefined,
+                    marginTop: "2rem",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    background: "rgba(0,0,0,0.06)",
+                    border: "1px solid rgba(0,0,0,0.1)",
+                    borderRadius: 9999,
+                    padding: "0.45rem 1rem",
                   }}
                 >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    className="transition-transform duration-300"
+                  <div
                     style={{
-                      transform: activeIndex === i ? "rotate(-45deg)" : "rotate(0deg)",
-                      stroke: activeIndex === i ? "white" : "#0B0B0B",
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background: active.color,
+                      transition: "background 0.3s ease",
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontFamily: "'Satoshi', sans-serif",
+                      fontWeight: 700,
+                      fontSize: "0.7rem",
+                      letterSpacing: "0.08em",
+                      color: "rgba(0,0,0,0.4)",
                     }}
                   >
-                    <path d="M3 8h10M9 4l4 4-4 4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                    IN-HOUSE SERVICE
+                  </span>
                 </div>
               </div>
-
-              {/* Mobile description */}
-              <div
-                className="md:hidden relative z-10 overflow-hidden transition-all duration-400"
-                style={{ maxHeight: activeIndex === i ? "200px" : "0px" }}
-              >
-                <p className="pb-6 text-[#0B0B0B]/60 text-sm leading-relaxed font-['Inter']">
-                  {service.description}
-                </p>
-              </div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>

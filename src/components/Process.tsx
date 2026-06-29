@@ -56,10 +56,10 @@ export default function Process() {
     if (!section || !track || !wrapper) return;
 
     const ctx = gsap.context(() => {
-      const totalWidth = track.scrollWidth - wrapper.offsetWidth;
+      const totalWidth = track.scrollWidth - wrapper.offsetWidth + 120;
 
       gsap.to(track, {
-        x: -totalWidth,
+        x: -(track.scrollWidth - wrapper.offsetWidth),
         ease: "none",
         scrollTrigger: {
           trigger: section,

@@ -33,12 +33,12 @@ export default function Home() {
       <div style={{ opacity: loading ? 0 : 1, transition: "opacity 0.3s ease" }}>
         <Hero />
         <Portfolio />
-        <Services />
-        <WhyUs />
         <Process />
+        <WhyUs />
         <Metrics />
         <TechStack />
         <MarqueeBar />
+        <Services />
         <MeetTeam />
         <FAQ />
         <Contact />

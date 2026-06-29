@@ -45,12 +45,12 @@ function FAQItem({ item, isOpen, onToggle }: { item: typeof faqs[0]; isOpen: boo
   const answerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="border-b border-[#D9D9D9] last:border-b-0">
+    <div className="border-b border-white/10 last:border-b-0">
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between py-6 text-left group cursor-pointer"
       >
-        <span className="font-['Satoshi'] font-semibold text-[#0B0B0B] text-base md:text-lg pr-8 group-hover:text-[#1D6FF2] transition-colors duration-200">
+        <span className="font-['Satoshi'] font-semibold text-white text-base md:text-lg pr-8 group-hover:text-[#4da6ff] transition-colors duration-200">
           {item.q}
         </span>
         <div
@@ -68,7 +68,7 @@ function FAQItem({ item, isOpen, onToggle }: { item: typeof faqs[0]; isOpen: boo
             className="transition-transform duration-300"
             style={{ transform: isOpen ? "rotate(45deg)" : "rotate(0deg)" }}
           >
-            <path d="M6 1v10M1 6h10" stroke={isOpen ? "white" : "#0B0B0B"} strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M6 1v10M1 6h10" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
           </svg>
         </div>
       </button>
@@ -78,7 +78,7 @@ function FAQItem({ item, isOpen, onToggle }: { item: typeof faqs[0]; isOpen: boo
         className="overflow-hidden transition-all duration-400"
         style={{ maxHeight: isOpen ? "300px" : "0px", opacity: isOpen ? 1 : 0 }}
       >
-        <p className="pb-6 text-[#0B0B0B]/60 text-sm leading-relaxed font-['Inter']">
+        <p className="pb-6 text-white/50 text-sm leading-relaxed font-['Inter']">
           {item.a}
         </p>
       </div>
@@ -107,18 +107,18 @@ export default function FAQ() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="bg-white py-24 md:py-32" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+    <section ref={sectionRef} className="py-24 md:py-32" style={{ backgroundColor: "#0B0B0B", minHeight: "100vh", display: "flex", flexDirection: "column", justifyContent: "center" }}>
       <div className="max-w-[1400px] mx-auto px-6 md:px-10">
         <div className="grid md:grid-cols-2 gap-16 md:gap-24">
           <div>
             <div className="flex items-center gap-3 mb-5">
               <div className="w-6 h-px bg-[#1D6FF2]" />
-              <span className="label text-[#0B0B0B]/40">FAQ</span>
+              <span className="label text-white/40">FAQ</span>
             </div>
-            <h2 className="h-large text-[#0B0B0B]">
+            <h2 className="h-large text-white">
               Frequently Asked
             </h2>
-            <p className="mt-6 text-[#0B0B0B]/50 text-sm leading-relaxed font-['Inter'] max-w-sm">
+            <p className="mt-6 text-white/50 text-sm leading-relaxed font-['Inter'] max-w-sm">
               Have more questions? Book a free 30-minute call and we&apos;ll answer everything.
             </p>
             <a
@@ -131,7 +131,7 @@ export default function FAQ() {
             </a>
           </div>
 
-          <div className="faq-container border-t border-[#D9D9D9]">
+          <div className="faq-container border-t border-white/10">
             {faqs.map((faq, i) => (
               <FAQItem
                 key={i}
