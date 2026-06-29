@@ -38,6 +38,7 @@ export default function CustomCursor() {
         marginLeft: -2,
         marginTop: -2,
       }}
+      className="hidden md:block"
     >
       <svg
         width="32"
