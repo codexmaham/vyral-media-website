@@ -9,7 +9,6 @@ import WhyUs from "@/components/WhyUs";
 import Process from "@/components/Process";
 import Metrics from "@/components/Metrics";
 import TechStack from "@/components/TechStack";
-import Testimonials from "@/components/Testimonials";
 import Portfolio from "@/components/VideoPortfolio";
 import MeetTeam from "@/components/MeetTeam";
 import FAQ from "@/components/FAQ";
@@ -34,13 +33,12 @@ export default function Home() {
       <div style={{ opacity: loading ? 0 : 1, transition: "opacity 0.3s ease" }}>
         <Hero />
         <Portfolio />
-        <MarqueeBar />
         <Services />
         <WhyUs />
         <Process />
         <Metrics />
         <TechStack />
-        <Testimonials />
+        <MarqueeBar />
         <MeetTeam />
         <FAQ />
         <Contact />

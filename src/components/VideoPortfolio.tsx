@@ -118,7 +118,7 @@ export default function Portfolio() {
       ref={sectionRef}
       id="portfolio"
       style={{
-        backgroundColor: "#ffffff",
+        backgroundColor: "#0B0B0B",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
@@ -138,12 +138,12 @@ export default function Portfolio() {
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", marginBottom: "3rem" }}>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
-              <div style={{ width: 24, height: 1, background: "#1D6FF2" }} />
-              <span className="label" style={{ color: "rgba(0,0,0,0.4)" }}>Our Work</span>
+              <div style={{ width: 24, height: 1, background: "rgba(255,255,255,0.3)" }} />
+              <span className="label" style={{ color: "rgba(255,255,255,0.4)" }}>Our Work</span>
             </div>
-            <h2 className="h-large" style={{ color: "#0B0B0B" }}>Portfolio</h2>
+            <h2 className="h-large" style={{ color: "#ffffff" }}>Portfolio</h2>
           </div>
-          <p style={{ color: "rgba(0,0,0,0.45)", fontFamily: "'Inter', sans-serif", fontSize: "0.9rem", lineHeight: 1.6, maxWidth: "22rem" }}>
+          <p style={{ color: "rgba(255,255,255,0.45)", fontFamily: "'Inter', sans-serif", fontSize: "0.9rem", lineHeight: 1.6, maxWidth: "22rem" }}>
             Real clients. Real results. Scroll through work that moved the needle.
           </p>
         </div>
