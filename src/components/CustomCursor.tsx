@@ -4,9 +4,6 @@ import { useEffect, useRef } from "react";
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const pos = useRef({ x: -200, y: -200 });
-  const current = useRef({ x: -200, y: -200 });
-  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     // Only on desktop
@@ -15,25 +12,16 @@ export default function CustomCursor() {
     document.body.style.cursor = "none";
 
     const onMove = (e: MouseEvent) => {
-      pos.current = { x: e.clientX, y: e.clientY };
-    };
-
-    const loop = () => {
-      current.current.x += (pos.current.x - current.current.x) * 0.12;
-      current.current.y += (pos.current.y - current.current.y) * 0.12;
       if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate(${current.current.x}px, ${current.current.y}px) rotate(-30deg)`;
+        cursorRef.current.style.transform = `translate(${e.clientX}px, ${e.clientY}px) rotate(-30deg)`;
       }
-      rafRef.current = requestAnimationFrame(loop);
     };
 
     window.addEventListener("mousemove", onMove, { passive: true });
-    rafRef.current = requestAnimationFrame(loop);
 
     return () => {
       document.body.style.cursor = "";
       window.removeEventListener("mousemove", onMove);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
