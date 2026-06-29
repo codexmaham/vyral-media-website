@@ -98,9 +98,9 @@ export default function Hero() {
         raysOrigin="top-center"
         raysColor="#4da6ff"
         raysSpeed={1.5}
-        lightSpread={1.8}
-        rayLength={3.5}
-        fadeDistance={2.5}
+        lightSpread={2.2}
+        rayLength={5.0}
+        fadeDistance={3.5}
         saturation={1.0}
         followMouse={true}
         mouseInfluence={0.15}
