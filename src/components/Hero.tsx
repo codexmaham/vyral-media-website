@@ -60,40 +60,37 @@ export default function Hero() {
       const dotEl = dotRef.current;
       if (!dotEl) return;
 
-      // Phase 1: dot bounces at center while text chars animate in
-      const startX = window.innerWidth / 2;
-      const startY = window.innerHeight * 0.46;
+      const cx = window.innerWidth / 2;
+      const floor = window.innerHeight * 0.42; // "bounce floor" ≈ heading center
 
-      gsap.set(dotEl, {
-        x: startX, y: startY,
-        xPercent: -50, yPercent: -50,
-        scale: 5, opacity: 0,
-      });
+      // Start: dot above the viewport, centered, big
+      gsap.set(dotEl, { x: cx, y: -80, xPercent: -50, yPercent: -50, scale: 4, opacity: 1 });
 
-      gsap.timeline({ delay: 0.08 })
-        .to(dotEl, { opacity: 1, duration: 0.1, ease: "none" })
-        .to(dotEl, { scaleX: 1.6, scaleY: 0.4, duration: 0.1, ease: "power2.in" })
-        .to(dotEl, { y: startY - 220, scaleX: 1, scaleY: 1, scale: 4, duration: 0.35, ease: "power2.out" })
-        .to(dotEl, { y: startY, scaleX: 1.5, scaleY: 0.4, duration: 0.25, ease: "power2.in" })
-        .to(dotEl, { y: startY - 100, scaleX: 1, scaleY: 1, scale: 2.5, duration: 0.22, ease: "power2.out" })
-        .to(dotEl, { y: startY, scaleX: 1.3, scaleY: 0.6, duration: 0.18, ease: "power2.in" })
-        // float gently while text reveals
-        .to(dotEl, { y: startY - 40, scale: 1.8, scaleX: 1, scaleY: 1, duration: 0.4, ease: "power1.out" });
+      // ITS-style drop + multi-bounce (total ~1.3s)
+      const bounceTl = gsap.timeline()
+        .to(dotEl, { y: floor, scaleX: 1.8, scaleY: 0.4, duration: 0.28, ease: "power3.in" })
+        .to(dotEl, { y: floor - 260, scaleX: 1, scaleY: 1, scale: 3, duration: 0.32, ease: "power2.out" })
+        .to(dotEl, { y: floor, scaleX: 1.6, scaleY: 0.35, duration: 0.22, ease: "power3.in" })
+        .to(dotEl, { y: floor - 130, scaleX: 1, scaleY: 1, scale: 2, duration: 0.22, ease: "power2.out" })
+        .to(dotEl, { y: floor, scaleX: 1.4, scaleY: 0.5, duration: 0.16, ease: "power3.in" })
+        .to(dotEl, { y: floor - 55, scaleX: 1, scaleY: 1, scale: 1.5, duration: 0.16, ease: "power2.out" })
+        .to(dotEl, { y: floor, scaleX: 1.2, scaleY: 0.7, duration: 0.1, ease: "power3.in" })
+        .to(dotEl, { y: floor - 20, scale: 1.2, scaleX: 1, scaleY: 1, duration: 0.14, ease: "power2.out" });
 
-      // Phase 2: after text chars are done (~1.1s), fly to "i" position
+      // Kill bounce & fly to "i" after text chars finish animating
       timerId = setTimeout(() => {
         const iEl = iRef.current;
         if (!iEl || !dotEl) return;
+        bounceTl.kill();
         const iRect = iEl.getBoundingClientRect();
-        // "i" is now at scale(1) — read true position
         const finalX = iRect.left + iRect.width / 2;
         const finalY = iRect.top + iRect.height * 0.12;
         gsap.to(dotEl, {
           x: finalX, y: finalY,
           scale: 1, scaleX: 1, scaleY: 1,
-          duration: 0.55, ease: "back.out(2.2)",
+          duration: 0.55, ease: "back.out(2)",
         });
-      }, 1150);
+      }, 1500);
 
       // 3D flip on Build after chars animate in
       gsap.to(".hero-build-word", {
@@ -186,8 +183,8 @@ export default function Hero() {
           ref={dotRef}
           style={{
             position: "fixed",
-            width: "clamp(8px,1.4vw,20px)",
-            height: "clamp(8px,1.4vw,20px)",
+            width: "clamp(14px,2vw,30px)",
+            height: "clamp(14px,2vw,30px)",
             borderRadius: "50%",
             background: "linear-gradient(135deg,#1D6FF2,#06B6D4)",
             boxShadow: "0 0 18px rgba(29,111,242,0.9), 0 0 6px rgba(6,182,212,0.6)",
