@@ -77,19 +77,33 @@ export default function Hero() {
         .to(dotEl, { y: floor, scaleX: 1.2, scaleY: 0.7, duration: 0.1, ease: "power3.in" })
         .to(dotEl, { y: floor - 20, scale: 1.2, scaleX: 1, scaleY: 1, duration: 0.14, ease: "power2.out" });
 
-      timerId = setTimeout(() => {
+      // Measure "ı" position early — before any transforms fire at t=1500ms
+      let finalX = 0, finalY = 0;
+      const measureTimer = setTimeout(() => {
         const iEl = iRef.current;
-        if (!iEl || !dotEl) return;
-        bounceTl.kill();
+        if (!iEl) return;
         const iRect = iEl.getBoundingClientRect();
-        const finalX = iRect.left + iRect.width / 2;
-        const finalY = iRect.top + iRect.height * 0.12;
+        finalX = iRect.left + iRect.width / 2;
+        finalY = iRect.top + iRect.height * 0.12;
+      }, 1200);
+
+      timerId = setTimeout(() => {
+        if (!dotEl) return;
+        bounceTl.kill();
 
         // Fly dot to "i" + fade out preloader overlay simultaneously
         gsap.to(dotEl, {
           x: finalX, y: finalY,
           scale: 1, scaleX: 1, scaleY: 1,
           duration: 0.55, ease: "back.out(2)",
+          onComplete: () => {
+            // 3D flip after dot lands
+            gsap.to(".hero-build-word", {
+              rotationY: 360,
+              duration: 1.2,
+              ease: "power2.inOut",
+            });
+          },
         });
         if (overlayEl) {
           gsap.to(overlayEl, { opacity: 0, duration: 0.7, ease: "power2.inOut", onComplete: () => {
@@ -97,14 +111,6 @@ export default function Hero() {
           }});
         }
       }, 1500);
-
-      // 3D flip on Build after chars animate in
-      gsap.to(".hero-build-word", {
-        rotationY: 360,
-        duration: 1.2,
-        delay: 1.5,
-        ease: "power2.inOut",
-      });
 
       // Scroll: pin hero, zoom Build to center then blast off
       const buildEl = containerRef.current?.querySelector(".hero-build-word") as HTMLElement | null;
@@ -201,6 +207,8 @@ export default function Hero() {
           ref={dotRef}
           style={{
             position: "fixed",
+            top: 0,
+            left: 0,
             width: "clamp(14px,2vw,30px)",
             height: "clamp(14px,2vw,30px)",
             borderRadius: "50%",
