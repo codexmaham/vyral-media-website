@@ -100,7 +100,7 @@ export default function Hero() {
         <div style={{ marginBottom: "3rem" }}>
 
           {/* Line 1: We Build */}
-          <div className="hero-line" style={{ lineHeight: 1, marginBottom: "0.05em", textAlign: "center" }}>
+          <div className="hero-line" style={{ lineHeight: 1, marginBottom: "0.05em", textAlign: "center", whiteSpace: "nowrap" }}>
             <span className="hero-fade" style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 900, fontSize: "clamp(64px,10vw,148px)", color: "#ffffff", letterSpacing: "-0.04em" }}>
               We{" "}
             </span>
