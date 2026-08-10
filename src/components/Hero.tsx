@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import GlitchText from "./GlitchText";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -102,23 +101,22 @@ export default function Hero() {
 
           {/* Line 1: We Build */}
           <div className="hero-line" style={{ lineHeight: 1, marginBottom: "0.05em", textAlign: "center" }}>
-            <GlitchText
-              speed={1}
-              enableShadows={true}
-              enableOnHover={true}
-              className="hero-fade hero-build-word"
-              style={{
-                fontFamily: "'Satoshi', sans-serif",
-                fontWeight: 900,
-                fontSize: "clamp(64px,10vw,148px)",
-                letterSpacing: "-0.04em",
-                color: "#ffffff",
-                display: "inline-block",
-                transformStyle: "preserve-3d",
-              }}
-            >
-              We Build
-            </GlitchText>
+            <span className="hero-fade" style={{ fontFamily: "'Satoshi', sans-serif", fontWeight: 900, fontSize: "clamp(64px,10vw,148px)", color: "#ffffff", letterSpacing: "-0.04em" }}>
+              We{" "}
+            </span>
+            <span className="hero-build-word" style={{
+              display: "inline-block",
+              fontFamily: "'Satoshi', sans-serif",
+              fontWeight: 900,
+              fontSize: "clamp(64px,10vw,148px)",
+              letterSpacing: "-0.04em",
+              background: "linear-gradient(135deg,#1D6FF2 0%,#06B6D4 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              transformStyle: "preserve-3d",
+            }}>
+              Build
+            </span>
           </div>
 
           {/* Line 2: Brands */}
