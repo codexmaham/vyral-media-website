@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Shuffle from "./Shuffle";
 
 const navLinks = [
   { label: "Services", href: "#services" },
@@ -57,9 +58,21 @@ export default function Navigation() {
             className="flex items-center gap-2 z-10"
           >
             <Image src="/vyral-icon.png" alt="Vyral Media" width={40} height={40} className="object-contain" />
-            <span className="font-['Satoshi'] font-black text-lg tracking-[-0.03em] hidden sm:block" style={{ color: "#ffffff" }}>
-              VYRAL<span style={{ background: "linear-gradient(135deg,#1D6FF2,#06B6D4)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>.</span>
-            </span>
+            <Shuffle
+              text="VYRAL."
+              tag="span"
+              className="font-['Satoshi'] font-black text-lg tracking-[-0.03em] hidden sm:block"
+              style={{ color: "#ffffff" }}
+              shuffleDirection="up"
+              duration={0.4}
+              stagger={0.04}
+              animationMode="evenodd"
+              triggerOnce={false}
+              triggerOnHover={true}
+              threshold={0}
+              rootMargin="0px"
+              textAlign="left"
+            />
           </a>
 
           {/* Desktop Links — md and above */}
@@ -72,7 +85,20 @@ export default function Navigation() {
                 className="label transition-colors duration-200"
                 style={{ color: "rgba(255,255,255,0.8)" }}
               >
-                {link.label}
+                <Shuffle
+                  text={link.label}
+                  tag="span"
+                  style={{ color: "rgba(255,255,255,0.8)", fontSize: "inherit", fontFamily: "inherit", fontWeight: "inherit", letterSpacing: "inherit" }}
+                  shuffleDirection="up"
+                  duration={0.3}
+                  stagger={0.03}
+                  animationMode="evenodd"
+                  triggerOnce={false}
+                  triggerOnHover={true}
+                  threshold={0}
+                  rootMargin="0px"
+                  textAlign="left"
+                />
               </a>
             ))}
           </div>
