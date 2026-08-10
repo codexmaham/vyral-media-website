@@ -82,7 +82,7 @@ export default function Hero() {
       ref={containerRef}
       id="hero"
       style={{
-        backgroundImage: "url('/background.jpg')",
+        backgroundImage: "url('/Background.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         minHeight: "100vh",
