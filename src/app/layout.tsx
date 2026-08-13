@@ -5,7 +5,9 @@ import StickyBookCTA from "@/components/StickyBookCTA";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ScrollProgress from "@/components/ScrollProgress";
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
-import CustomCursor from "@/components/CustomCursor";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Vyral Media | We Build Brands People Remember",
@@ -33,7 +35,6 @@ export default function RootLayout({
       <head />
       <body>
         <SmoothScrollProvider>
-          <CustomCursor />
           <ScrollProgress />
           <Navigation />
           <main>{children}</main>
