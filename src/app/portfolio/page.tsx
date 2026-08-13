@@ -1,43 +1,14 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import PortfolioGrid from "@/components/PortfolioGrid";
-import { videos, graphics, allPieces } from "@/data/portfolio";
-
-const filters = [
-  { key: "all", label: "All" },
-  { key: "video", label: "Motion" },
-  { key: "graphic", label: "Design" },
-] as const;
-
-type FilterKey = (typeof filters)[number]["key"];
+import { VideoRail, GraphicGrid } from "@/components/PortfolioGrid";
+import { videos, graphics } from "@/data/portfolio";
 
 export default function PortfolioPage() {
-  const [filter, setFilter] = useState<FilterKey>("all");
-
-  const pieces = useMemo(() => {
-    if (filter === "video") return videos;
-    if (filter === "graphic") return graphics;
-    // Interleave so "All" reads as a curated mix, not two blocks
-    const mixed: typeof allPieces = [];
-    const max = Math.max(videos.length, graphics.length);
-    for (let i = 0; i < max; i++) {
-      if (videos[i]) mixed.push(videos[i]);
-      if (graphics[i]) mixed.push(graphics[i]);
-    }
-    return mixed;
-  }, [filter]);
-
-  const clients = useMemo(
-    () => Array.from(new Set(pieces.map((p) => p.client))).length,
-    [pieces]
-  );
-
   return (
     <main style={{ minHeight: "100vh", background: "#08080B", color: "#fff" }}>
-      {/* ─────────────────────────────────────────────── Header ───── */}
+      {/* ───────────────────────────────────────────────── Header ───── */}
       <header
         style={{
           position: "sticky",
@@ -65,24 +36,16 @@ export default function PortfolioPage() {
             </span>
           </Link>
 
-          <Link
-            href="/"
-            style={{
-              fontFamily: "'Satoshi',sans-serif",
-              fontWeight: 500,
-              fontSize: "0.78rem",
-              letterSpacing: "0.06em",
-              color: "rgba(255,255,255,0.55)",
-              textDecoration: "none",
-            }}
-          >
-            ← Index
-          </Link>
+          <nav style={{ display: "flex", alignItems: "center", gap: "clamp(1rem,3vw,2rem)" }}>
+            <a href="#motion" style={navLink}>Video</a>
+            <a href="#design" style={navLink}>Graphic</a>
+            <Link href="/" style={{ ...navLink, color: "rgba(255,255,255,0.4)" }}>← Index</Link>
+          </nav>
         </div>
       </header>
 
-      {/* ───────────────────────────────────────────────── Hero ───── */}
-      <section style={{ padding: "clamp(4rem,10vw,8rem) clamp(20px,5vw,72px) clamp(2.5rem,5vw,4rem)" }}>
+      {/* ─────────────────────────────────────────────────── Hero ───── */}
+      <section style={{ padding: "clamp(4rem,10vw,7.5rem) clamp(20px,5vw,72px) clamp(2.5rem,5vw,4rem)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.85rem", marginBottom: "1.75rem" }}>
           <div style={{ width: 28, height: 1, background: "rgba(255,255,255,0.28)" }} />
           <span
@@ -113,10 +76,9 @@ export default function PortfolioPage() {
           Portfolio
         </h1>
 
-        {/* Meta row */}
         <div
           style={{
-            marginTop: "clamp(2rem,4vw,3.25rem)",
+            marginTop: "clamp(2rem,4vw,3rem)",
             paddingTop: "1.5rem",
             borderTop: "1px solid rgba(255,255,255,0.08)",
             display: "flex",
@@ -126,57 +88,24 @@ export default function PortfolioPage() {
             gap: "2rem",
           }}
         >
-          {/* Filters */}
-          <nav style={{ display: "flex", gap: "clamp(1.25rem,3vw,2.5rem)" }}>
-            {filters.map((f) => {
-              const active = filter === f.key;
-              return (
-                <button
-                  key={f.key}
-                  onClick={() => setFilter(f.key)}
-                  style={{
-                    position: "relative",
-                    background: "none",
-                    border: "none",
-                    padding: "0 0 8px",
-                    cursor: "pointer",
-                    fontFamily: "'Satoshi',sans-serif",
-                    fontWeight: 600,
-                    fontSize: "clamp(0.95rem,2.4vw,1.35rem)",
-                    letterSpacing: "-0.01em",
-                    color: active ? "#fff" : "rgba(255,255,255,0.32)",
-                    transition: "color 300ms",
-                  }}
-                >
-                  {f.label}
-                  <span
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      bottom: 0,
-                      height: 1,
-                      width: active ? "100%" : "0%",
-                      background: "#1D6FF2",
-                      transition: "width 480ms cubic-bezier(0.16,1,0.3,1)",
-                    }}
-                  />
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* Counters */}
-          <dl
+          <p
             style={{
-              display: "flex",
-              gap: "clamp(1.5rem,4vw,3rem)",
+              fontFamily: "'Inter',sans-serif",
+              fontSize: "0.9rem",
+              lineHeight: 1.7,
+              color: "rgba(255,255,255,0.45)",
+              maxWidth: "30rem",
               margin: 0,
-              fontFamily: "'Satoshi',sans-serif",
             }}
           >
+            Two disciplines, two showcases — motion work built for the feed, and design
+            systems built to hold a brand together.
+          </p>
+
+          <dl style={{ display: "flex", gap: "clamp(1.5rem,4vw,3rem)", margin: 0, fontFamily: "'Satoshi',sans-serif" }}>
             {[
-              { n: pieces.length, l: "Pieces" },
-              { n: clients, l: "Clients" },
+              { n: videos.length, l: "Videos" },
+              { n: graphics.length, l: "Graphics" },
             ].map((s) => (
               <div key={s.l}>
                 <dt style={{ fontSize: "0.62rem", letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.32)", marginBottom: 4 }}>
@@ -191,9 +120,21 @@ export default function PortfolioPage() {
         </div>
       </section>
 
-      {/* ───────────────────────────────────────────────── Grid ───── */}
-      <section style={{ padding: "0 clamp(20px,5vw,72px) clamp(5rem,10vw,9rem)" }}>
-        <PortfolioGrid key={filter} pieces={pieces} />
+      {/* ────────────────────────────────────────────── 01 Motion ───── */}
+      <section id="motion" style={{ padding: "clamp(2rem,4vw,3rem) clamp(20px,5vw,72px) clamp(4rem,8vw,6.5rem)" }}>
+        <VideoRail pieces={videos} />
+      </section>
+
+      {/* ────────────────────────────────────────────── 02 Design ───── */}
+      <section
+        id="design"
+        style={{
+          background: "#0B0B10",
+          borderTop: "1px solid rgba(255,255,255,0.06)",
+          padding: "clamp(4rem,8vw,6.5rem) clamp(20px,5vw,72px)",
+        }}
+      >
+        <GraphicGrid pieces={graphics} />
       </section>
 
       {/* ────────────────────────────────────────────────── CTA ───── */}
@@ -242,3 +183,12 @@ export default function PortfolioPage() {
     </main>
   );
 }
+
+const navLink: React.CSSProperties = {
+  fontFamily: "'Satoshi',sans-serif",
+  fontWeight: 500,
+  fontSize: "0.78rem",
+  letterSpacing: "0.06em",
+  color: "rgba(255,255,255,0.65)",
+  textDecoration: "none",
+};

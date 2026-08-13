@@ -4,119 +4,142 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import type { Piece } from "@/data/portfolio";
 
-/* ────────────────────────────────────────────────────────────── Card ───── */
+/* ══════════════════════════════════════════════════════ Section head ═════ */
 
-function Card({ piece, index, onOpen }: { piece: Piece; index: number; onOpen: () => void }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [hover, setHover] = useState(false);
-
-  const enter = () => {
-    setHover(true);
-    const v = videoRef.current;
-    if (v) v.play().catch(() => {});
-  };
-  const leave = () => {
-    setHover(false);
-    const v = videoRef.current;
-    if (v) { v.pause(); v.currentTime = 0; }
-  };
-
-  const isFeature = piece.span === 2;
-
+function SectionHead({
+  index,
+  kind,
+  title,
+  blurb,
+  count,
+  action,
+}: {
+  index: string;
+  kind: string;
+  title: string;
+  blurb: string;
+  count: number;
+  action?: React.ReactNode;
+}) {
   return (
-    <figure
-      onMouseEnter={enter}
-      onMouseLeave={leave}
-      onClick={onOpen}
+    <div
       style={{
-        gridColumn: isFeature ? "span 2" : "span 1",
-        position: "relative",
-        margin: 0,
-        cursor: "pointer",
-        aspectRatio: piece.type === "video"
-          ? (isFeature ? "4 / 3" : "9 / 16")
-          : (isFeature ? "4 / 3" : "1 / 1"),
-        overflow: "hidden",
-        background: "#0E0E10",
-        borderRadius: 2,
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: "2rem",
+        paddingBottom: "1.4rem",
+        borderBottom: "1px solid rgba(255,255,255,0.09)",
+        marginBottom: "clamp(1.75rem,3.5vw,2.75rem)",
       }}
     >
-      {/* Media */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          transform: hover ? "scale(1.045)" : "scale(1)",
-          transition: "transform 900ms cubic-bezier(0.16,1,0.3,1)",
-          willChange: "transform",
-        }}
-      >
-        {piece.type === "video" ? (
-          <video
-            ref={videoRef}
-            // #t=0.1 makes the browser seek and paint a first frame as a poster
-            src={`${piece.src}#t=0.1`}
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-          />
-        ) : (
-          <Image
-            src={piece.src}
-            alt={piece.title}
-            fill
-            sizes={isFeature ? "(max-width:900px) 100vw, 66vw" : "(max-width:900px) 50vw, 33vw"}
-            style={{ objectFit: "cover" }}
-          />
-        )}
+      <div style={{ minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.8rem", marginBottom: "1rem" }}>
+          <span style={label}>{index}</span>
+          <div style={{ width: 22, height: 1, background: "rgba(255,255,255,0.25)" }} />
+          <span style={label}>{kind}</span>
+        </div>
+        <h2
+          style={{
+            fontFamily: "'Satoshi',sans-serif",
+            fontWeight: 900,
+            fontSize: "clamp(2.25rem,6.5vw,5rem)",
+            letterSpacing: "-0.045em",
+            lineHeight: 0.9,
+            margin: 0,
+            color: "#fff",
+          }}
+        >
+          {title}
+          <sup
+            style={{
+              fontSize: "0.24em",
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+              color: "rgba(255,255,255,0.35)",
+              marginLeft: "0.5em",
+              top: "-1.4em",
+              position: "relative",
+            }}
+          >
+            {String(count).padStart(2, "0")}
+          </sup>
+        </h2>
       </div>
 
-      {/* Veil */}
+      <div style={{ display: "flex", alignItems: "flex-end", gap: "1.5rem", flexWrap: "wrap" }}>
+        <p
+          style={{
+            fontFamily: "'Inter',sans-serif",
+            fontSize: "0.85rem",
+            lineHeight: 1.65,
+            color: "rgba(255,255,255,0.4)",
+            maxWidth: "20rem",
+            margin: 0,
+          }}
+        >
+          {blurb}
+        </p>
+        {action}
+      </div>
+    </div>
+  );
+}
+
+const label: React.CSSProperties = {
+  fontFamily: "'Satoshi',sans-serif",
+  fontWeight: 500,
+  fontSize: "0.68rem",
+  letterSpacing: "0.2em",
+  textTransform: "uppercase",
+  color: "rgba(255,255,255,0.38)",
+};
+
+/* ══════════════════════════════════════════════════════════ Overlay ══════ */
+
+function Overlay({ piece, index, hover }: { piece: Piece; index: number; hover: boolean }) {
+  return (
+    <>
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background: "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.15) 42%, rgba(0,0,0,0) 70%)",
+          background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.12) 45%, transparent 72%)",
           opacity: hover ? 1 : 0,
-          transition: "opacity 600ms cubic-bezier(0.16,1,0.3,1)",
+          transition: "opacity 560ms cubic-bezier(0.16,1,0.3,1)",
           pointerEvents: "none",
         }}
       />
-
-      {/* Index — top right */}
       <span
         style={{
           position: "absolute",
-          top: 16,
-          right: 18,
+          top: 14,
+          right: 16,
           fontFamily: "'Satoshi',sans-serif",
           fontWeight: 500,
-          fontSize: "0.7rem",
+          fontSize: "0.68rem",
           letterSpacing: "0.12em",
-          color: "rgba(255,255,255,0.75)",
+          color: "#fff",
+          mixBlendMode: "difference",
           opacity: hover ? 1 : 0,
           transform: hover ? "translateY(0)" : "translateY(-6px)",
-          transition: "all 520ms cubic-bezier(0.16,1,0.3,1)",
+          transition: "all 500ms cubic-bezier(0.16,1,0.3,1)",
           pointerEvents: "none",
-          mixBlendMode: "difference",
         }}
       >
         {String(index + 1).padStart(2, "0")}
       </span>
-
-      {/* Metadata — bottom left */}
       <figcaption
         style={{
           position: "absolute",
-          left: 20,
-          right: 20,
-          bottom: 18,
+          left: 18,
+          right: 18,
+          bottom: 16,
           pointerEvents: "none",
           opacity: hover ? 1 : 0,
-          transform: hover ? "translateY(0)" : "translateY(14px)",
-          transition: "opacity 520ms cubic-bezier(0.16,1,0.3,1), transform 620ms cubic-bezier(0.16,1,0.3,1)",
+          transform: hover ? "translateY(0)" : "translateY(12px)",
+          transition: "opacity 500ms cubic-bezier(0.16,1,0.3,1), transform 600ms cubic-bezier(0.16,1,0.3,1)",
         }}
       >
         <div
@@ -124,44 +147,41 @@ function Card({ piece, index, onOpen }: { piece: Piece; index: number; onOpen: (
             height: 1,
             width: hover ? "100%" : "0%",
             background: "rgba(255,255,255,0.35)",
-            marginBottom: 12,
-            transition: "width 760ms cubic-bezier(0.16,1,0.3,1) 60ms",
+            marginBottom: 10,
+            transition: "width 720ms cubic-bezier(0.16,1,0.3,1) 60ms",
           }}
         />
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "1rem" }}>
-          <h3
-            style={{
-              margin: 0,
-              fontFamily: "'Satoshi',sans-serif",
-              fontWeight: 700,
-              fontSize: isFeature ? "1.15rem" : "0.95rem",
-              letterSpacing: "-0.02em",
-              lineHeight: 1.15,
-              color: "#fff",
-            }}
-          >
-            {piece.title}
-          </h3>
-          <span
-            style={{
-              flexShrink: 0,
-              fontFamily: "'Satoshi',sans-serif",
-              fontWeight: 500,
-              fontSize: "0.66rem",
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.55)",
-            }}
-          >
-            {piece.client}
-          </span>
-        </div>
+        <h3
+          style={{
+            margin: "0 0 3px",
+            fontFamily: "'Satoshi',sans-serif",
+            fontWeight: 700,
+            fontSize: "0.92rem",
+            letterSpacing: "-0.015em",
+            lineHeight: 1.2,
+            color: "#fff",
+          }}
+        >
+          {piece.title}
+        </h3>
+        <span
+          style={{
+            fontFamily: "'Satoshi',sans-serif",
+            fontWeight: 500,
+            fontSize: "0.63rem",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            color: "rgba(255,255,255,0.55)",
+          }}
+        >
+          {piece.client}
+        </span>
       </figcaption>
-    </figure>
+    </>
   );
 }
 
-/* ───────────────────────────────────────────────────────── Lightbox ───── */
+/* ═════════════════════════════════════════════════════════ Lightbox ══════ */
 
 function Lightbox({
   pieces,
@@ -175,7 +195,6 @@ function Lightbox({
   onIndex: (i: number) => void;
 }) {
   const piece = pieces[index];
-
   const prev = useCallback(() => onIndex((index - 1 + pieces.length) % pieces.length), [index, pieces.length, onIndex]);
   const next = useCallback(() => onIndex((index + 1) % pieces.length), [index, pieces.length, onIndex]);
 
@@ -200,66 +219,52 @@ function Lightbox({
         position: "fixed",
         inset: 0,
         zIndex: 9999,
-        background: "rgba(6,6,10,0.96)",
-        backdropFilter: "blur(20px)",
+        background: "rgba(6,6,10,0.97)",
+        backdropFilter: "blur(24px)",
         display: "flex",
         flexDirection: "column",
-        animation: "lbFade 260ms ease",
+        animation: "lbFade 240ms ease",
       }}
     >
       <style>{`
-        @keyframes lbFade { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes lbRise { from { opacity: 0; transform: translateY(16px) } to { opacity: 1; transform: translateY(0) } }
+        @keyframes lbFade { from { opacity:0 } to { opacity:1 } }
+        @keyframes lbRise { from { opacity:0; transform:translateY(14px) } to { opacity:1; transform:translateY(0) } }
       `}</style>
 
-      {/* Top bar */}
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "1.25rem clamp(16px,4vw,40px)",
-          flexShrink: 0,
-        }}
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.15rem clamp(16px,4vw,40px)", flexShrink: 0 }}
       >
         <div>
-          <div style={{ fontFamily: "'Satoshi',sans-serif", fontWeight: 700, fontSize: "0.95rem", color: "#fff", letterSpacing: "-0.01em" }}>
-            {piece.title}
-          </div>
-          <div style={{ fontFamily: "'Satoshi',sans-serif", fontWeight: 500, fontSize: "0.68rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginTop: 3 }}>
-            {piece.client}
-          </div>
+          <div style={{ fontFamily: "'Satoshi',sans-serif", fontWeight: 700, fontSize: "0.95rem", color: "#fff" }}>{piece.title}</div>
+          <div style={{ ...label, fontSize: "0.63rem", marginTop: 3 }}>{piece.client}</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-          <span style={{ fontFamily: "'Satoshi',sans-serif", fontSize: "0.72rem", letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)" }}>
+          <span style={{ fontFamily: "'Satoshi',sans-serif", fontSize: "0.72rem", letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)", fontVariantNumeric: "tabular-nums" }}>
             {String(index + 1).padStart(2, "0")} / {String(pieces.length).padStart(2, "0")}
           </span>
           <button onClick={onClose} aria-label="Close" style={iconBtn}>✕</button>
         </div>
       </div>
 
-      {/* Stage */}
       <div
         onClick={onClose}
-        style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 clamp(16px,4vw,40px) 1rem", minHeight: 0, gap: "1rem" }}
+        style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 clamp(16px,4vw,40px) 1.25rem", minHeight: 0, gap: "1rem" }}
       >
-        <button onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Previous" style={{ ...iconBtn, width: 46, height: 46, fontSize: 20, flexShrink: 0 }}>‹</button>
-
+        <button onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Previous" style={{ ...iconBtn, width: 46, height: 46, fontSize: 20 }}>‹</button>
         <div
           key={piece.src}
           onClick={(e) => e.stopPropagation()}
-          style={{ flex: 1, height: "100%", display: "flex", alignItems: "center", justifyContent: "center", animation: "lbRise 380ms cubic-bezier(0.16,1,0.3,1)", minWidth: 0 }}
+          style={{ flex: 1, height: "100%", display: "flex", alignItems: "center", justifyContent: "center", animation: "lbRise 360ms cubic-bezier(0.16,1,0.3,1)", minWidth: 0 }}
         >
           {piece.type === "video" ? (
-            <video src={piece.src} controls autoPlay playsInline style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 4, display: "block" }} />
+            <video src={piece.src} controls autoPlay playsInline style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 4 }} />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={piece.src} alt={piece.title} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: 4, display: "block" }} />
+            <img src={piece.src} alt={piece.title} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: 4 }} />
           )}
         </div>
-
-        <button onClick={(e) => { e.stopPropagation(); next(); }} aria-label="Next" style={{ ...iconBtn, width: 46, height: 46, fontSize: 20, flexShrink: 0 }}>›</button>
+        <button onClick={(e) => { e.stopPropagation(); next(); }} aria-label="Next" style={{ ...iconBtn, width: 46, height: 46, fontSize: 20 }}>›</button>
       </div>
     </div>
   );
@@ -278,32 +283,204 @@ const iconBtn: React.CSSProperties = {
   alignItems: "center",
   justifyContent: "center",
   flexShrink: 0,
-  transition: "background 200ms",
 };
 
-/* ───────────────────────────────────────────────────────────── Grid ───── */
+/* ═══════════════════════════════════════════════════════ Video rail ══════ */
 
-export default function PortfolioGrid({ pieces }: { pieces: Piece[] }) {
+function ReelCard({ piece, index, onOpen }: { piece: Piece; index: number; onOpen: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [hover, setHover] = useState(false);
+
+  return (
+    <figure
+      onMouseEnter={() => { setHover(true); videoRef.current?.play().catch(() => {}); }}
+      onMouseLeave={() => { setHover(false); const v = videoRef.current; if (v) { v.pause(); v.currentTime = 0; } }}
+      onClick={onOpen}
+      style={{
+        position: "relative",
+        margin: 0,
+        flexShrink: 0,
+        width: "clamp(200px, 21vw, 290px)",
+        aspectRatio: "9 / 16",
+        borderRadius: 3,
+        overflow: "hidden",
+        background: "#0E0E10",
+        cursor: "pointer",
+        scrollSnapAlign: "start",
+      }}
+    >
+      <video
+        ref={videoRef}
+        src={`${piece.src}#t=0.1`}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          display: "block",
+          transform: hover ? "scale(1.05)" : "scale(1)",
+          transition: "transform 900ms cubic-bezier(0.16,1,0.3,1)",
+        }}
+      />
+      {/* Idle play glyph */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: hover ? 0 : 1,
+          transition: "opacity 400ms",
+          pointerEvents: "none",
+        }}
+      >
+        <span
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: "50%",
+            border: "1px solid rgba(255,255,255,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backdropFilter: "blur(6px)",
+            background: "rgba(0,0,0,0.2)",
+          }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z" /></svg>
+        </span>
+      </div>
+      <Overlay piece={piece} index={index} hover={hover} />
+    </figure>
+  );
+}
+
+export function VideoRail({ pieces, action }: { pieces: Piece[]; action?: React.ReactNode }) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState<number | null>(null);
+
+  const scrollBy = (dir: 1 | -1) => {
+    const el = railRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: "smooth" });
+  };
+
+  return (
+    <>
+      <style>{`.reel-rail::-webkit-scrollbar{display:none}`}</style>
+
+      <SectionHead
+        index="01"
+        kind="Motion"
+        title="Video"
+        count={pieces.length}
+        blurb="Short-form reels and brand films built for the feed. Hover to preview, click for full screen."
+        action={
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <button onClick={() => scrollBy(-1)} aria-label="Scroll left" style={iconBtn}>‹</button>
+            <button onClick={() => scrollBy(1)} aria-label="Scroll right" style={iconBtn}>›</button>
+          </div>
+        }
+      />
+
+      <div
+        ref={railRef}
+        className="reel-rail"
+        style={{
+          display: "flex",
+          gap: "clamp(8px,1vw,14px)",
+          overflowX: "auto",
+          scrollSnapType: "x mandatory",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          paddingBottom: 4,
+        }}
+      >
+        {pieces.map((piece, i) => (
+          <ReelCard key={piece.src} piece={piece} index={i} onOpen={() => setOpen(i)} />
+        ))}
+      </div>
+
+      {action && <div style={{ marginTop: "1.75rem" }}>{action}</div>}
+
+      {open !== null && <Lightbox pieces={pieces} index={open} onClose={() => setOpen(null)} onIndex={setOpen} />}
+    </>
+  );
+}
+
+/* ════════════════════════════════════════════════════ Graphic grid ══════ */
+
+function GraphicCard({ piece, index, onOpen }: { piece: Piece; index: number; onOpen: () => void }) {
+  const [hover, setHover] = useState(false);
+
+  return (
+    <figure
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onClick={onOpen}
+      style={{
+        position: "relative",
+        margin: 0,
+        aspectRatio: "1 / 1",
+        borderRadius: 3,
+        overflow: "hidden",
+        background: "#0E0E10",
+        cursor: "pointer",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          transform: hover ? "scale(1.05)" : "scale(1)",
+          transition: "transform 900ms cubic-bezier(0.16,1,0.3,1)",
+        }}
+      >
+        <Image
+          src={piece.src}
+          alt={piece.title}
+          fill
+          sizes="(max-width:640px) 50vw, (max-width:1100px) 33vw, 25vw"
+          style={{ objectFit: "cover" }}
+        />
+      </div>
+      <Overlay piece={piece} index={index} hover={hover} />
+    </figure>
+  );
+}
+
+export function GraphicGrid({ pieces, action }: { pieces: Piece[]; action?: React.ReactNode }) {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
     <>
+      <SectionHead
+        index="02"
+        kind="Design"
+        title="Graphic"
+        count={pieces.length}
+        blurb="Social campaigns, brand systems and key visuals. Click any frame to open it full size."
+      />
+
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(min(260px, 100%), 1fr))",
-          gap: "clamp(6px, 0.9vw, 14px)",
-          gridAutoFlow: "dense",
+          gridTemplateColumns: "repeat(auto-fill, minmax(min(230px,100%), 1fr))",
+          gap: "clamp(8px,1vw,14px)",
         }}
       >
         {pieces.map((piece, i) => (
-          <Card key={piece.src} piece={piece} index={i} onOpen={() => setOpen(i)} />
+          <GraphicCard key={piece.src} piece={piece} index={i} onOpen={() => setOpen(i)} />
         ))}
       </div>
 
-      {open !== null && (
-        <Lightbox pieces={pieces} index={open} onClose={() => setOpen(null)} onIndex={setOpen} />
-      )}
+      {action && <div style={{ marginTop: "1.75rem" }}>{action}</div>}
+
+      {open !== null && <Lightbox pieces={pieces} index={open} onClose={() => setOpen(null)} onIndex={setOpen} />}
     </>
   );
 }

@@ -68,13 +68,9 @@ export const graphics: Piece[] = [
 
 export const allPieces: Piece[] = [...videos, ...graphics];
 
-/** Hand-picked mix for the homepage teaser — two features, four standard,
- *  so the grid keeps an uneven editorial rhythm instead of a flat row. */
-export const featured: Piece[] = [
-  videos[0],    // Speedster Windbreaker — feature
-  graphics[6],  // Qualified Leads
-  videos[1],    // Kickster
-  graphics[0],  // Fountain View Residential — feature
-  videos[7],    // Dr. Zarak
-  graphics[17], // Doner Series II
+/** Homepage teaser sets — each medium keeps its own showcase. */
+export const featuredVideos: Piece[] = videos.slice(0, 8);
+export const featuredGraphics: Piece[] = [
+  graphics[0], graphics[5], graphics[12], graphics[16],
+  graphics[1], graphics[6], graphics[13], graphics[17],
 ];
