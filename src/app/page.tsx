@@ -27,7 +27,10 @@ export default function Home() {
   return (
     <>
       {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
-      <div style={{ opacity: loading ? 0 : 1, transition: "opacity 0.3s ease" }}>
+      {/* Content stays fully opaque and simply sits behind the opaque
+          preloader. Fading it in as the overlay faded out meant two
+          translucent layers over a white body — which flashed white. */}
+      <div>
         <Hero />
         <Suspense fallback={null}>
           <Portfolio />
