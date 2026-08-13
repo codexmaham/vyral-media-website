@@ -285,7 +285,7 @@ export default function Portfolio() {
                   color: tab === t ? "#fff" : "rgba(255,255,255,0.5)",
                 }}
               >
-                {t === "video" ? "🎬 Video" : "🎨 Graphic"}
+                {t === "video" ? "Video" : "Graphic"}
               </button>
             ))}
           </div>
