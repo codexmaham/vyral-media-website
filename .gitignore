@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Source video portfolio — 1.2 GB, and one file exceeds GitHub's 100 MB
+# per-file limit, so it cannot be committed. Poster frames in
+# "public/Video Posters" are tracked; the videos need compressing and/or
+# hosting on a CDN before the deployed site can play them.
+/public/Video Portfolio

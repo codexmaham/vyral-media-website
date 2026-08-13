@@ -258,7 +258,7 @@ function Lightbox({
           style={{ flex: 1, height: "100%", display: "flex", alignItems: "center", justifyContent: "center", animation: "lbRise 360ms cubic-bezier(0.16,1,0.3,1)", minWidth: 0 }}
         >
           {piece.type === "video" ? (
-            <video src={piece.src} controls autoPlay playsInline style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 4 }} />
+            <video src={piece.src} poster={piece.poster} controls autoPlay playsInline style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 4 }} />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={piece.src} alt={piece.title} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: 4 }} />
@@ -289,12 +289,36 @@ const iconBtn: React.CSSProperties = {
 
 function ReelCard({ piece, index, onOpen }: { piece: Piece; index: number; onOpen: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const wantPlay = useRef(false);
   const [hover, setHover] = useState(false);
+  const [playing, setPlaying] = useState(false);
+
+  // With preload="none" the first play() often rejects because no data has
+  // arrived yet — retry once the element reports it can play.
+  const tryPlay = () => {
+    if (wantPlay.current) videoRef.current?.play().catch(() => {});
+  };
+
+  const enter = () => {
+    wantPlay.current = true;
+    setHover(true);
+    tryPlay();
+  };
+
+  const leave = () => {
+    wantPlay.current = false;
+    setHover(false);
+    setPlaying(false);
+    const v = videoRef.current;
+    if (!v) return;
+    v.pause();
+    v.currentTime = 0;
+  };
 
   return (
     <figure
-      onMouseEnter={() => { setHover(true); videoRef.current?.play().catch(() => {}); }}
-      onMouseLeave={() => { setHover(false); const v = videoRef.current; if (v) { v.pause(); v.currentTime = 0; } }}
+      onMouseEnter={enter}
+      onMouseLeave={leave}
       onClick={onOpen}
       style={{
         position: "relative",
@@ -311,11 +335,16 @@ function ReelCard({ piece, index, onOpen }: { piece: Piece; index: number; onOpe
     >
       <video
         ref={videoRef}
-        src={`${piece.src}#t=0.1`}
+        src={piece.src}
         muted
         loop
         playsInline
-        preload="metadata"
+        // The source files run up to 123 MB — nothing is fetched until hover.
+        preload="none"
+        onCanPlay={tryPlay}
+        onLoadedData={tryPlay}
+        onPlaying={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
         style={{
           width: "100%",
           height: "100%",
@@ -325,7 +354,28 @@ function ReelCard({ piece, index, onOpen }: { piece: Piece; index: number; onOpe
           transition: "transform 900ms cubic-bezier(0.16,1,0.3,1)",
         }}
       />
-      {/* Idle play glyph */}
+
+      {/* Poster sits above the video and only clears once playback actually
+          starts. Using the video's own `poster` attribute instead would leave
+          a decoded frame — frequently black — on screen after pausing. */}
+      <Image
+        src={piece.poster ?? piece.src}
+        alt={piece.title}
+        fill
+        sizes="(max-width:640px) 60vw, 290px"
+        style={{
+          objectFit: "cover",
+          opacity: playing ? 0 : 1,
+          transition: "opacity 260ms ease",
+          transform: hover ? "scale(1.05)" : "scale(1)",
+          transitionProperty: "opacity, transform",
+          transitionDuration: "260ms, 900ms",
+          transitionTimingFunction: "ease, cubic-bezier(0.16,1,0.3,1)",
+          pointerEvents: "none",
+        }}
+      />
+      {/* Idle play glyph — stays up until playback really starts, so a slow
+          video still gives feedback instead of an empty card. */}
       <div
         style={{
           position: "absolute",
@@ -333,7 +383,7 @@ function ReelCard({ piece, index, onOpen }: { piece: Piece; index: number; onOpe
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          opacity: hover ? 0 : 1,
+          opacity: playing ? 0 : 1,
           transition: "opacity 400ms",
           pointerEvents: "none",
         }}
@@ -361,13 +411,73 @@ function ReelCard({ piece, index, onOpen }: { piece: Piece; index: number; onOpe
 
 export function VideoRail({ pieces, action }: { pieces: Piece[]; action?: React.ReactNode }) {
   const railRef = useRef<HTMLDivElement>(null);
+  const tweenRef = useRef<number | null>(null);
   const [open, setOpen] = useState<number | null>(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
+
+  useEffect(() => () => { if (tweenRef.current) cancelAnimationFrame(tweenRef.current); }, []);
+
+  const syncEdges = useCallback(() => {
+    const el = railRef.current;
+    if (!el) return;
+    setAtStart(el.scrollLeft <= 2);
+    setAtEnd(el.scrollLeft >= el.scrollWidth - el.clientWidth - 2);
+  }, []);
+
+  useEffect(syncEdges, [syncEdges, pieces]);
 
   const scrollBy = (dir: 1 | -1) => {
     const el = railRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: "smooth" });
+
+    const first = el.firstElementChild as HTMLElement | null;
+    const gap = parseFloat(getComputedStyle(el).columnGap || "0") || 0;
+    const pitch = first ? first.getBoundingClientRect().width + gap : el.clientWidth;
+    const step = Math.max(1, Math.floor(el.clientWidth / pitch));
+
+    // Absolute target from the current card index, so a click always lands on a
+    // card boundary regardless of where a previous animation stopped.
+    const currentCard = Math.round(el.scrollLeft / pitch);
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    const to = Math.min(maxScroll, Math.max(0, (currentCard + dir * step) * pitch));
+
+    // Hand-rolled tween: native `behavior: "smooth"` gets cancelled here after
+    // the first animation (re-renders from the scroll handler interrupt it),
+    // which left the arrows stuck. Writing scrollLeft directly always sticks.
+    if (tweenRef.current) cancelAnimationFrame(tweenRef.current);
+    const from = el.scrollLeft;
+    const distance = to - from;
+    if (!distance) return;
+
+    const duration = 480;
+    const start = performance.now();
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    const frame = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      el.scrollLeft = from + distance * easeOut(t);
+      if (t < 1) tweenRef.current = requestAnimationFrame(frame);
+      else tweenRef.current = null;
+    };
+    tweenRef.current = requestAnimationFrame(frame);
   };
+
+  const arrow = (dir: 1 | -1, disabled: boolean) => (
+    <button
+      onClick={() => scrollBy(dir)}
+      disabled={disabled}
+      aria-label={dir === 1 ? "Scroll right" : "Scroll left"}
+      style={{
+        ...iconBtn,
+        opacity: disabled ? 0.3 : 1,
+        cursor: disabled ? "default" : "pointer",
+        transition: "opacity 260ms",
+      }}
+    >
+      {dir === 1 ? "›" : "‹"}
+    </button>
+  );
 
   return (
     <>
@@ -381,8 +491,8 @@ export function VideoRail({ pieces, action }: { pieces: Piece[]; action?: React.
         blurb="Short-form reels and brand films built for the feed. Hover to preview, click for full screen."
         action={
           <div style={{ display: "flex", gap: "0.5rem" }}>
-            <button onClick={() => scrollBy(-1)} aria-label="Scroll left" style={iconBtn}>‹</button>
-            <button onClick={() => scrollBy(1)} aria-label="Scroll right" style={iconBtn}>›</button>
+            {arrow(-1, atStart)}
+            {arrow(1, atEnd)}
           </div>
         }
       />
@@ -390,11 +500,14 @@ export function VideoRail({ pieces, action }: { pieces: Piece[]; action?: React.
       <div
         ref={railRef}
         className="reel-rail"
+        onScroll={syncEdges}
         style={{
           display: "flex",
           gap: "clamp(8px,1vw,14px)",
           overflowX: "auto",
-          scrollSnapType: "x mandatory",
+          // `mandatory` re-snaps mid-animation and cancels programmatic
+          // scrolls, which made the arrow buttons look broken.
+          scrollSnapType: "x proximity",
           scrollbarWidth: "none",
           msOverflowStyle: "none",
           paddingBottom: 4,
