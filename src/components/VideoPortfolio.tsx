@@ -45,7 +45,7 @@ function ViewAll({ children }: { children: string }) {
 
 export default function Portfolio() {
   return (
-    <>
+    <div style={{ position: "relative", zIndex: 20, isolation: "isolate" }}>
       {/* ── Motion ── */}
       <section id="work" style={{ background: "#08080B", padding: "clamp(5rem,10vw,7.5rem) clamp(20px,5vw,72px) clamp(3.5rem,7vw,5rem)" }}>
         <VideoRail
@@ -56,7 +56,10 @@ export default function Portfolio() {
 
       {/* ── Design ── */}
       <section
+        id="graphic-portfolio"
         style={{
+          position: "relative",
+          zIndex: 2,
           background: "#0B0B10",
           borderTop: "1px solid rgba(255,255,255,0.06)",
           padding: "clamp(3.5rem,7vw,5.5rem) clamp(20px,5vw,72px) clamp(5rem,10vw,7.5rem)",
@@ -67,6 +70,6 @@ export default function Portfolio() {
           action={<ViewAll>{`All ${graphics.length} graphics`}</ViewAll>}
         />
       </section>
-    </>
+    </div>
   );
 }
