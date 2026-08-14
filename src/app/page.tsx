@@ -28,15 +28,8 @@ export default function Home() {
 
   useEffect(() => {
     if (loading) return;
-    const refresh = () => ScrollTrigger.refresh();
-    const t1 = window.setTimeout(refresh, 800);
-    const t2 = window.setTimeout(refresh, 1800);
-    window.addEventListener("load", refresh);
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.removeEventListener("load", refresh);
-    };
+    const t = window.setTimeout(() => ScrollTrigger.refresh(), 1200);
+    return () => window.clearTimeout(t);
   }, [loading]);
 
   return (

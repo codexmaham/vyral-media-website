@@ -133,8 +133,7 @@ export default function Hero({ ready }: { ready: boolean }) {
         start: "top top",
         end: "+=160%",
         pin: true,
-        pinType: "transform",
-        anticipatePin: 0,
+        anticipatePin: 1,
         scrub: 1.2,
         animation: gsap
           .timeline()
