@@ -24,8 +24,8 @@ export default function SmoothScrollProvider({
     lenisRef.current = lenis;
 
     ScrollTrigger.scrollerProxy(document.documentElement, {
-      scrollTop(value) {
-        if (arguments.length) {
+      scrollTop(value?: number) {
+        if (value !== undefined) {
           lenis.scrollTo(value, { immediate: true });
         }
         return lenis.scroll;
