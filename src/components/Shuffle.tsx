@@ -71,10 +71,11 @@ const Shuffle = ({
   const hoverHandlerRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    if ('fonts' in document) {
-      if (document.fonts.status === 'loaded') setFontsLoaded(true);
-      else document.fonts.ready.then(() => setFontsLoaded(true));
-    } else setFontsLoaded(true);
+    if (!("fonts" in document)) {
+      queueMicrotask(() => setFontsLoaded(true));
+      return;
+    }
+    void document.fonts.ready.then(() => setFontsLoaded(true));
   }, []);
 
   const scrollTriggerStart = useMemo(() => {
@@ -136,7 +137,8 @@ const Shuffle = ({
         const rolls = Math.max(1, Math.floor(shuffleTimes));
         const rand = (set: string) => set.charAt(Math.floor(Math.random() * set.length)) || '';
 
-        chars.forEach(ch => {
+        chars.forEach((charEl) => {
+          const ch = charEl as HTMLElement;
           const parent = ch.parentElement;
           if (!parent) return;
           const w = ch.getBoundingClientRect().width;

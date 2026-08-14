@@ -451,11 +451,12 @@ export function VideoRail({ pieces, action }: { pieces: Piece[]; action?: React.
     if (!distance) return;
 
     const duration = 480;
-    const start = performance.now();
+    let startTime: number | undefined;
     const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 
     const frame = (now: number) => {
-      const t = Math.min(1, (now - start) / duration);
+      if (startTime === undefined) startTime = now;
+      const t = Math.min(1, (now - startTime) / duration);
       el.scrollLeft = from + distance * easeOut(t);
       if (t < 1) tweenRef.current = requestAnimationFrame(frame);
       else tweenRef.current = null;
