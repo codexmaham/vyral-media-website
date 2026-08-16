@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { scrollToSection } from "@/lib/scroll-to";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -123,7 +124,7 @@ export default function FAQ() {
             </p>
             <a
               href="#contact"
-              onClick={(e) => { e.preventDefault(); document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" }); }}
+              onClick={(e) => { e.preventDefault(); scrollToSection("#contact"); }}
               className="mt-8 inline-flex items-center gap-2 bg-[#1D6FF2] font-['Satoshi'] font-semibold px-6 py-3.5 rounded-full hover:bg-[#0B0B0B] transition-colors duration-300"
               style={{ color: "#ffffff" }}
             >

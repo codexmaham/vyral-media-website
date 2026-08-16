@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { registerLenis, unregisterLenis } from "@/lib/scroll-to";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,6 +23,7 @@ export default function SmoothScrollProvider({
     });
 
     lenisRef.current = lenis;
+    registerLenis(lenis);
 
     ScrollTrigger.scrollerProxy(document.documentElement, {
       scrollTop(value?: number) {
@@ -53,6 +55,7 @@ export default function SmoothScrollProvider({
 
     return () => {
       gsap.ticker.remove(ticker);
+      unregisterLenis();
       lenis.destroy();
     };
   }, []);

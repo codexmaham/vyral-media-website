@@ -5,6 +5,8 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
+import { BackgroundPixelStars } from "@/components/ui/background-pixel-stars";
+import { scrollToSection } from "@/lib/scroll-to";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -18,14 +20,13 @@ const proof = [
 const headline: React.CSSProperties = {
   fontFamily: "'Satoshi', sans-serif",
   fontWeight: 900,
-  fontSize: "clamp(52px, 9vw, 132px)",
+  fontSize: "clamp(36px, 5.5vw, 72px)",
   letterSpacing: "-0.045em",
   lineHeight: 0.95,
 };
 
 export default function Hero({ ready }: { ready: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const spotRef = useRef<HTMLDivElement>(null);
   const [introReady, setIntroReady] = useState(false);
 
   useEffect(() => {
@@ -91,35 +92,6 @@ export default function Hero({ ready }: { ready: boolean }) {
             .to(".hero-rise", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.1 }, "-=0.55");
         }
 
-      /* ── Ambient background drift ──────────────────────────────────── */
-      gsap.utils.toArray<HTMLElement>(".hero-blob").forEach((blob, i) => {
-        gsap.to(blob, {
-          x: `random(-140, 140)`,
-          y: `random(-90, 90)`,
-          scale: `random(0.9, 1.25)`,
-          duration: 14 + i * 4,
-          ease: "sine.inOut",
-          repeat: -1,
-          yoyo: true,
-          delay: i * 1.5,
-        });
-      });
-
-      /* ── Cursor spotlight (fine pointers only) ─────────────────────── */
-      const spot = spotRef.current;
-      if (spot && !window.matchMedia("(pointer: coarse)").matches) {
-        const xTo = gsap.quickTo(spot, "x", { duration: 0.9, ease: "power3.out" });
-        const yTo = gsap.quickTo(spot, "y", { duration: 0.9, ease: "power3.out" });
-        const onMove = (e: MouseEvent) => {
-          const r = containerRef.current?.getBoundingClientRect();
-          if (!r) return;
-          xTo(e.clientX - r.left);
-          yTo(e.clientY - r.top);
-        };
-        containerRef.current?.addEventListener("mousemove", onMove);
-        gsap.to(spot, { opacity: 1, duration: 1.2, delay: 0.6 });
-      }
-
       /* ── Scroll: pin, zoom "Build" to centre, blast off ────────────── */
       const buildEl = containerRef.current?.querySelector(".hero-build-word") as HTMLElement | null;
       const buildRect = buildEl?.getBoundingClientRect();
@@ -176,11 +148,9 @@ export default function Hero({ ready }: { ready: boolean }) {
     <section
       ref={containerRef}
       id="hero"
-      className={ready && introReady ? undefined : "hero-awaiting"}
+      className={`hero-pixel-bg${ready && introReady ? "" : " hero-awaiting"}`}
       style={{
-        backgroundImage: "url('/Background.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        backgroundColor: "#08080B",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
@@ -190,7 +160,12 @@ export default function Hero({ ready }: { ready: boolean }) {
         perspective: "1200px",
       }}
     >
+      <BackgroundPixelStars containerRef={containerRef} />
       <style>{`
+        .hero-pixel-bg {
+          background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAIElEQVR42mIUEhJiwAbevXuHVZyJgUQwqmEUDB0AEGAADd8DEPTX6ksAAAAASUVORK5CYII=");
+          background-size: 10px 10px;
+        }
         #hero.hero-awaiting .hero-headline,
         #hero.hero-awaiting .hero-sub,
         #hero.hero-awaiting .hero-ctas,
@@ -204,8 +179,14 @@ export default function Hero({ ready }: { ready: boolean }) {
         }
         .hero-build-word .hero-char {
           background: linear-gradient(135deg, #1D6FF2 0%, #06B6D4 100%);
+          background-clip: text;
           -webkit-background-clip: text;
+          color: transparent !important;
           -webkit-text-fill-color: transparent;
+        }
+        .hero-that-word .hero-char {
+          color: rgba(255, 255, 255, 0.38) !important;
+          -webkit-text-fill-color: rgba(255, 255, 255, 0.38);
         }
         @keyframes heroProofScroll {
           0% { transform: translateX(0); }
@@ -236,50 +217,74 @@ export default function Hero({ ready }: { ready: boolean }) {
           .hero-proof-desktop { display: none; }
           .hero-proof-marquee { display: block; }
         }
+        .hero-layout {
+          max-width: 52rem;
+          margin: 0 auto;
+          text-align: center;
+        }
+        .hero-headline .hero-line {
+          text-align: center;
+        }
+        .hero-ctas-wrap {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .hero-ctas {
+          position: relative;
+          z-index: 2;
+          display: flex;
+          gap: 0.85rem;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+        .hero-rainbow-glow {
+          position: absolute;
+          left: 50%;
+          bottom: -1.1rem;
+          z-index: 1;
+          width: min(440px, 88vw);
+          height: 3px;
+          transform: translateX(-50%);
+          border-radius: 999px;
+          background: linear-gradient(
+            90deg,
+            #ff0080,
+            #ff6a00,
+            #ffd500,
+            #00e676,
+            #00b4ff,
+            #7c4dff,
+            #ff0080
+          );
+          background-size: 200% 100%;
+          filter: blur(6px);
+          opacity: 0.9;
+          animation: heroRainbowShift 5s linear infinite;
+        }
+        .hero-rainbow-glow::after {
+          content: "";
+          position: absolute;
+          inset: -10px -28px -18px;
+          border-radius: 999px;
+          background: inherit;
+          background-size: inherit;
+          filter: blur(22px);
+          opacity: 0.55;
+          animation: inherit;
+        }
+        @keyframes heroRainbowShift {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 200% 50%; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-rainbow-glow,
+          .hero-rainbow-glow::after {
+            animation: none;
+          }
+        }
       `}</style>
-
-      {/* ── Ambient depth ─────────────────────────────────────────────── */}
-      <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 1 }}>
-        {[
-          { c: "rgba(29,111,242,0.30)", s: "46vw", t: "6%", l: "-6%" },
-          { c: "rgba(6,182,212,0.22)", s: "38vw", t: "48%", l: "62%" },
-          { c: "rgba(124,58,237,0.20)", s: "34vw", t: "62%", l: "12%" },
-        ].map((b, i) => (
-          <div
-            key={i}
-            className="hero-blob"
-            style={{
-              position: "absolute",
-              top: b.t,
-              left: b.l,
-              width: b.s,
-              height: b.s,
-              borderRadius: "50%",
-              background: `radial-gradient(circle, ${b.c} 0%, transparent 70%)`,
-              filter: "blur(60px)",
-              willChange: "transform",
-            }}
-          />
-        ))}
-
-        {/* Cursor spotlight */}
-        <div
-          ref={spotRef}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "40vw",
-            height: "40vw",
-            marginLeft: "-20vw",
-            marginTop: "-20vw",
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(29,111,242,0.16) 0%, transparent 65%)",
-            opacity: 0,
-            willChange: "transform",
-          }}
-        />
-      </div>
 
       {/* ── Content ───────────────────────────────────────────────────── */}
       <div
@@ -290,60 +295,64 @@ export default function Hero({ ready }: { ready: boolean }) {
           maxWidth: "1400px",
           margin: "0 auto",
           width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
           textAlign: "center",
         }}
       >
-        {/* Headline */}
-        <div className="hero-headline" style={{ marginBottom: "2rem" }}>
-          <div className="hero-line" style={{ ...headline, marginBottom: "0.04em", whiteSpace: "nowrap" }}>
-            <span className="hero-split hero-fade" style={{ color: "#ffffff" }}>We </span>
-            <span
-              className="hero-split hero-build-word"
+        <div className="hero-layout">
+          <div>
+            <div className="hero-headline" style={{ marginBottom: "2rem" }}>
+              <div className="hero-line" style={{ ...headline, marginBottom: "0.04em" }}>
+                <span className="hero-split hero-fade" style={{ color: "#ffffff" }}>We </span>
+                <span
+                  className="hero-split hero-build-word"
+                  style={{
+                    display: "inline-block",
+                    transformStyle: "preserve-3d",
+                    ...headline,
+                  }}
+                >
+                  Build
+                </span>
+              </div>
+
+              <div className="hero-line hero-fade" style={{ ...headline, marginBottom: "0.04em", color: "#ffffff" }}>
+                <span className="hero-split">Brands</span>
+              </div>
+
+              <div className="hero-line hero-fade" style={{ ...headline }}>
+                <span className="hero-split hero-that-word">That </span>
+                <span className="hero-split" style={{ color: "#ffffff" }}>Grow.</span>
+              </div>
+            </div>
+
+            {/* Subheadline */}
+            <p
+              className="hero-fade hero-split-words hero-sub"
               style={{
-                display: "inline-block",
-                transformStyle: "preserve-3d",
-                ...headline,
+                fontFamily: "'Inter',sans-serif",
+                fontSize: "clamp(0.85rem, 1.1vw, 0.95rem)",
+                lineHeight: 1.65,
+                color: "rgba(255,255,255,0.55)",
+                maxWidth: "32rem",
+                margin: "0 auto 2.25rem",
+                textAlign: "center",
               }}
             >
-              Build
-            </span>
-          </div>
+              Performance marketing, brand identity, video and web, for brands that need to move.
+            </p>
 
-          <div className="hero-line hero-fade" style={{ ...headline, marginBottom: "0.04em", color: "#ffffff" }}>
-            <span className="hero-split">Brands</span>
-          </div>
-
-          <div className="hero-line hero-fade" style={{ ...headline }}>
-            <span className="hero-split" style={{ color: "rgba(255,255,255,0.18)" }}>That </span>
-            <span className="hero-split" style={{ color: "#ffffff" }}>Grow.</span>
-          </div>
-        </div>
-
-        {/* Subheadline */}
-        <p
-          className="hero-fade hero-split-words hero-sub"
-          style={{
-            fontFamily: "'Inter',sans-serif",
-            fontSize: "clamp(0.95rem, 1.5vw, 1.1rem)",
-            lineHeight: 1.65,
-            color: "rgba(255,255,255,0.55)",
-            maxWidth: "38rem",
-            margin: "0 auto 2.25rem",
-          }}
-        >
-          Performance marketing, brand identity, video and web, for brands that need to move.
-        </p>
-
-        {/* CTAs */}
-        <div
-          className="hero-rise hero-fade hero-ctas"
-          style={{ display: "flex", gap: "0.85rem", justifyContent: "center", flexWrap: "wrap" }}
-        >
+            {/* CTAs */}
+            <div className="hero-rise hero-fade hero-ctas-wrap">
+              <div className="hero-ctas">
           <a
             href="#contact"
             onClick={(e) => {
               e.preventDefault();
-              document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
+              scrollToSection("#contact");
             }}
             className="group"
             style={{
@@ -356,7 +365,7 @@ export default function Hero({ ready }: { ready: boolean }) {
               color: "#fff",
               textDecoration: "none",
               padding: "0.95rem 2rem",
-              borderRadius: 999,
+              borderRadius: 10,
               background: "linear-gradient(135deg,#1D6FF2,#06B6D4)",
               boxShadow: "0 8px 30px rgba(29,111,242,0.35)",
             }}
@@ -378,7 +387,7 @@ export default function Hero({ ready }: { ready: boolean }) {
               color: "#fff",
               textDecoration: "none",
               padding: "0.95rem 2rem",
-              borderRadius: 999,
+              borderRadius: 10,
               border: "1px solid rgba(255,255,255,0.24)",
               background: "rgba(255,255,255,0.03)",
               backdropFilter: "blur(8px)",
@@ -387,6 +396,10 @@ export default function Hero({ ready }: { ready: boolean }) {
             View Work
             <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
           </Link>
+              </div>
+              <div className="hero-rainbow-glow" aria-hidden="true" />
+            </div>
+          </div>
         </div>
       </div>
 

@@ -28,7 +28,7 @@ export default function Home() {
 
   useEffect(() => {
     if (loading) return;
-    const t = window.setTimeout(() => ScrollTrigger.refresh(), 1200);
+    const t = window.setTimeout(() => ScrollTrigger.refresh(), 2000);
     return () => window.clearTimeout(t);
   }, [loading]);
 
@@ -37,7 +37,7 @@ export default function Home() {
       {loading && <LoadingScreen onComplete={() => setLoading(false)} />}
       <div>
         <Hero ready={!loading} />
-        <Portfolio />
+        <Portfolio ready={!loading} />
         <Process ready={!loading} />
         <WhyUs />
         <Metrics />

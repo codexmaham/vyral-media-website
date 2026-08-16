@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import { scrollToSection } from "@/lib/scroll-to";
+
 gsap.registerPlugin(ScrollTrigger);
 
 const steps = [
@@ -90,10 +92,10 @@ export default function Process({ ready }: { ready: boolean }) {
 
     const refresh = () => ScrollTrigger.refresh();
     const fontsReady = document.fonts?.ready ?? Promise.resolve();
-    // Hero pin-spacer must exist before Process start/end are measured.
+    // Hero + portfolio pin-spacers must exist before Process start/end are measured.
     const t = window.setTimeout(() => {
       fontsReady.then(setup);
-    }, 1500);
+    }, 1800);
 
     window.addEventListener("resize", refresh);
 
@@ -166,7 +168,7 @@ export default function Process({ ready }: { ready: boolean }) {
                 </p>
                 <a
                   href="#contact"
-                  onClick={(e) => { e.preventDefault(); document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" }); }}
+                  onClick={(e) => { e.preventDefault(); scrollToSection("#contact"); }}
                   className="inline-flex items-center gap-2 bg-white font-['Satoshi'] font-bold text-sm px-5 py-3 rounded-full transition-colors duration-300"
                   style={{ color: "#ffffff", backgroundColor: "#1D6FF2" }}
                   onMouseEnter={(e) => { const el = e.currentTarget; el.style.backgroundColor = "#0B0B0B"; el.style.color = "#ffffff"; }}

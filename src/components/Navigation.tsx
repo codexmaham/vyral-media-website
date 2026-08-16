@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
+import { scrollToSection } from "@/lib/scroll-to";
 import Shuffle from "./Shuffle";
 
 const navLinks = [
@@ -19,31 +20,35 @@ export default function Navigation() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const [active, setActive] = useState<string | null>(null);
-  const lastScrollY = useRef(0);
+  const [ctaHover, setCtaHover] = useState(false);
 
   const listRef = useRef<HTMLDivElement>(null);
   const indicatorRef = useRef<HTMLSpanElement>(null);
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
   const ctaRef = useRef<HTMLAnchorElement>(null);
 
-  /* ── Show/hide on scroll ─────────────────────────────────────────────── */
   useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 50);
-      setHidden(y > lastScrollY.current && y > 200 && !menuOpen);
-      lastScrollY.current = y;
-    };
+    const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
     return () => window.removeEventListener("scroll", onScroll);
-  }, [menuOpen]);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const closeOnDesktop = () => {
+      if (mq.matches) setMenuOpen(false);
+    };
+    mq.addEventListener("change", closeOnDesktop);
+    closeOnDesktop();
+    return () => mq.removeEventListener("change", closeOnDesktop);
+  }, []);
 
   /* ── Which section am I in? ──────────────────────────────────────────── */
   useEffect(() => {
@@ -130,24 +135,62 @@ export default function Navigation() {
 
   const scrollTo = (href: string) => {
     setMenuOpen(false);
-    setTimeout(() => {
-      document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-    }, menuOpen ? 400 : 0);
+    setTimeout(() => scrollToSection(href), menuOpen ? 400 : 0);
   };
 
   // /portfolio ships its own header; rendering this one too stacked two bars
   // at top:0. Hooks above still run so their order stays stable.
   if (pathname !== "/") return null;
 
+  const ctaStyle: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    fontFamily: "'Satoshi',sans-serif",
+    fontWeight: 600,
+    fontSize: "0.82rem",
+    color: "#ffffff",
+    textDecoration: "none",
+    padding: "0.72rem 1.35rem",
+    borderRadius: 10,
+    border: "1px solid rgba(255,255,255,0.35)",
+    willChange: "transform",
+    position: "relative",
+    overflow: "hidden",
+  };
+
+  const mobileCtaStyle: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.55rem",
+    fontFamily: "'Satoshi',sans-serif",
+    fontWeight: 600,
+    fontSize: "0.9rem",
+    color: "#fff",
+    textDecoration: "none",
+    padding: "0.9rem 1.65rem",
+    borderRadius: 10,
+    background: "linear-gradient(135deg,#1D6FF2,#06B6D4)",
+    boxShadow: "0 8px 30px rgba(29,111,242,0.35)",
+  };
+
   return (
     <>
       <nav
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${
-          hidden ? "-translate-y-full" : "translate-y-0"
-        } ${scrolled ? "border-b border-white/10 backdrop-blur-md" : ""}`}
+        className={`absolute top-0 left-0 right-0 z-[100] transition-all duration-500 ${
+          scrolled ? "border-b border-white/10 backdrop-blur-md" : ""
+        }`}
         style={scrolled ? { background: "rgba(7,7,20,0.72)" } : { background: "transparent" }}
       >
-        <div className="flex items-center justify-between px-6 md:px-10 h-[70px]">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0 1.5rem",
+            height: 70,
+          }}
+        >
           {/* Logo */}
           <a
             href="#"
@@ -173,7 +216,11 @@ export default function Navigation() {
           </a>
 
           {/* Desktop links + active indicator */}
-          <div ref={listRef} className="hidden md:flex items-center gap-8 relative">
+          <div
+            ref={listRef}
+            className="nav-desktop-only"
+            style={{ alignItems: "center", gap: "2rem", position: "relative" }}
+          >
             {navLinks.map((link) => {
               const isActive = active === link.href;
               return (
@@ -231,89 +278,172 @@ export default function Navigation() {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="nav-desktop-only" style={{ alignItems: "center", gap: "1rem" }}>
             <a
               ref={ctaRef}
               href="#contact"
               onClick={(e) => { e.preventDefault(); scrollTo("#contact"); }}
-              className="group relative flex items-center gap-2 label px-5 py-3 rounded-full overflow-hidden"
-              style={{ border: "1px solid rgba(255,255,255,0.35)", color: "#ffffff", willChange: "transform" }}
+              onMouseEnter={() => setCtaHover(true)}
+              onMouseLeave={() => setCtaHover(false)}
+              style={ctaStyle}
             >
-              {/* Gradient wipes up from the bottom on hover */}
               <span
                 aria-hidden
-                className="absolute inset-0 origin-bottom scale-y-0 transition-transform duration-400 ease-out group-hover:scale-y-100"
-                style={{ background: "linear-gradient(135deg,#1D6FF2,#06B6D4)" }}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  transformOrigin: "bottom",
+                  transform: ctaHover ? "scaleY(1)" : "scaleY(0)",
+                  transition: "transform 400ms ease-out",
+                  background: "linear-gradient(135deg,#1D6FF2,#06B6D4)",
+                }}
               />
-              <span className="relative z-10">Book a Call</span>
-              <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-1">→</span>
+              <span style={{ position: "relative", zIndex: 1 }}>Book a Call</span>
+              <span
+                style={{
+                  position: "relative",
+                  zIndex: 1,
+                  transition: "transform 300ms ease",
+                  transform: ctaHover ? "translateX(4px)" : "none",
+                }}
+              >
+                →
+              </span>
             </a>
           </div>
 
-          {/* Mobile/Tablet — Menu button */}
+          {/* Mobile — Menu button */}
           <button
+            type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden flex items-center gap-2.5 cursor-pointer"
             aria-label="Toggle menu"
             aria-expanded={menuOpen}
+            className="nav-mobile-only"
+            style={{
+              alignItems: "center",
+              gap: "0.65rem",
+              cursor: "pointer",
+              background: "transparent",
+              border: "none",
+              padding: 0,
+              color: "#fff",
+            }}
           >
             <span
-              className="font-['Satoshi'] font-medium text-sm tracking-[0.12em] uppercase"
-              style={{ color: "rgba(255,255,255,0.9)" }}
+              style={{
+                fontFamily: "'Satoshi',sans-serif",
+                fontWeight: 600,
+                fontSize: "0.78rem",
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.9)",
+              }}
             >
               {menuOpen ? "Close" : "Menu"}
             </span>
-            <div className="flex flex-col gap-[5px] w-6">
-              <span className={`block h-px transition-all duration-300 origin-center ${menuOpen ? "rotate-45 translate-y-[7px] w-6" : "w-6"}`} style={{ background: "#ffffff" }} />
-              <span className={`block h-px transition-all duration-300 ${menuOpen ? "opacity-0 w-0" : "w-4"}`} style={{ background: "#ffffff" }} />
-              <span className={`block h-px transition-all duration-300 origin-center ${menuOpen ? "-rotate-45 -translate-y-[7px] w-6" : "w-6"}`} style={{ background: "#ffffff" }} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 5, width: 24 }}>
+              <span
+                style={{
+                  display: "block",
+                  height: 1,
+                  width: menuOpen ? 24 : 24,
+                  background: "#ffffff",
+                  transition: "transform 300ms ease, opacity 300ms ease, width 300ms ease",
+                  transform: menuOpen ? "translateY(6px) rotate(45deg)" : "none",
+                  transformOrigin: "center",
+                }}
+              />
+              <span
+                style={{
+                  display: "block",
+                  height: 1,
+                  width: menuOpen ? 0 : 16,
+                  background: "#ffffff",
+                  opacity: menuOpen ? 0 : 1,
+                  transition: "transform 300ms ease, opacity 300ms ease, width 300ms ease",
+                }}
+              />
+              <span
+                style={{
+                  display: "block",
+                  height: 1,
+                  width: menuOpen ? 24 : 24,
+                  background: "#ffffff",
+                  transition: "transform 300ms ease, opacity 300ms ease, width 300ms ease",
+                  transform: menuOpen ? "translateY(-6px) rotate(-45deg)" : "none",
+                  transformOrigin: "center",
+                }}
+              />
             </div>
           </button>
         </div>
       </nav>
 
-      {/* Mobile/Tablet fullscreen overlay menu */}
+      {/* Mobile fullscreen overlay menu */}
       <div
-        className={`fixed inset-0 z-[99] flex flex-col justify-center px-8 transition-all duration-500 md:hidden ${
-          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-        style={{ background: "#07071A" }}
+        className={`nav-mobile-overlay fixed inset-0 z-[99] ${menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        style={{
+          background: "#07071A",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: "5.5rem 2rem 2.5rem",
+          transition: "opacity 500ms ease",
+        }}
       >
-        <div className="flex flex-col gap-2">
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
           {navLinks.map((link, i) => (
             <a
               key={link.href}
               href={link.href}
               onClick={(e) => { e.preventDefault(); scrollTo(link.href); }}
-              className="font-['Satoshi'] font-black text-[clamp(2.5rem,8vw,4rem)] leading-tight tracking-[-0.03em] flex items-center gap-4"
               style={{
-                color: active === link.href ? "#ffffff" : "rgba(255,255,255,0.15)",
+                display: "flex",
+                alignItems: "center",
+                gap: "1rem",
+                fontFamily: "'Satoshi',sans-serif",
+                fontWeight: 900,
+                fontSize: "clamp(2rem, 9vw, 3.25rem)",
+                lineHeight: 1.05,
+                letterSpacing: "-0.03em",
+                textDecoration: "none",
+                color: active === link.href ? "#ffffff" : "rgba(255,255,255,0.38)",
                 transform: menuOpen ? "translateY(0)" : "translateY(18px)",
                 opacity: menuOpen ? 1 : 0,
                 transition: "transform 520ms cubic-bezier(0.16,1,0.3,1), opacity 420ms ease, color 300ms ease",
                 transitionDelay: menuOpen ? `${120 + i * 60}ms` : "0ms",
               }}
             >
-              <span className="text-xs font-normal tracking-widest opacity-40 w-6">0{i + 1}</span>
+              <span
+                style={{
+                  fontFamily: "'Satoshi',sans-serif",
+                  fontSize: "0.72rem",
+                  fontWeight: 500,
+                  letterSpacing: "0.16em",
+                  color: "rgba(255,255,255,0.35)",
+                  width: "1.75rem",
+                  flexShrink: 0,
+                }}
+              >
+                0{i + 1}
+              </span>
               {link.label}
             </a>
           ))}
         </div>
-        <div className="mt-10 flex items-center gap-6">
+        <div style={{ marginTop: "2.25rem" }}>
           <a
             href="#contact"
             onClick={(e) => { e.preventDefault(); scrollTo("#contact"); }}
-            className="label px-6 py-3 rounded-full"
             style={{
-              background: "#ffffff",
-              color: "#07071A",
+              ...mobileCtaStyle,
               opacity: menuOpen ? 1 : 0,
               transform: menuOpen ? "translateY(0)" : "translateY(18px)",
               transition: "transform 520ms cubic-bezier(0.16,1,0.3,1), opacity 420ms ease",
               transitionDelay: menuOpen ? `${120 + navLinks.length * 60}ms` : "0ms",
             }}
           >
-            Book a Call →
+            Book a Call
+            <span>→</span>
           </a>
         </div>
       </div>

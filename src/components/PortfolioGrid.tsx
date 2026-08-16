@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, type RefObject } from "react";
 import Image from "next/image";
 import type { Piece } from "@/data/portfolio";
 
@@ -13,6 +13,7 @@ function SectionHead({
   blurb,
   count,
   action,
+  compact = false,
 }: {
   index: string;
   kind: string;
@@ -20,6 +21,7 @@ function SectionHead({
   blurb: string;
   count: number;
   action?: React.ReactNode;
+  compact?: boolean;
 }) {
   return (
     <div
@@ -28,10 +30,10 @@ function SectionHead({
         alignItems: "flex-end",
         justifyContent: "space-between",
         flexWrap: "wrap",
-        gap: "2rem",
-        paddingBottom: "1.4rem",
+        gap: compact ? "1.25rem" : "2rem",
+        paddingBottom: compact ? "0.85rem" : "1.4rem",
         borderBottom: "1px solid rgba(255,255,255,0.09)",
-        marginBottom: "clamp(1.75rem,3.5vw,2.75rem)",
+        marginBottom: compact ? "1rem" : "clamp(1.75rem,3.5vw,2.75rem)",
       }}
     >
       <div style={{ minWidth: 0 }}>
@@ -44,7 +46,7 @@ function SectionHead({
           style={{
             fontFamily: "'Satoshi',sans-serif",
             fontWeight: 900,
-            fontSize: "clamp(2.25rem,6.5vw,5rem)",
+            fontSize: compact ? "clamp(2rem,5vw,3.75rem)" : "clamp(2.25rem,6.5vw,5rem)",
             letterSpacing: "-0.045em",
             lineHeight: 0.9,
             margin: 0,
@@ -183,7 +185,7 @@ function Overlay({ piece, index, hover }: { piece: Piece; index: number; hover: 
 
 /* ═════════════════════════════════════════════════════════ Lightbox ══════ */
 
-function Lightbox({
+export function PortfolioLightbox({
   pieces,
   index,
   onClose,
@@ -237,7 +239,7 @@ function Lightbox({
       >
         <div>
           <div style={{ fontFamily: "'Satoshi',sans-serif", fontWeight: 700, fontSize: "0.95rem", color: "#fff" }}>{piece.title}</div>
-          <div style={{ ...label, fontSize: "0.63rem", marginTop: 3 }}>{piece.client}</div>
+          <div style={{ ...label, fontSize: "0.63rem", marginTop: 3 }}>Made for {piece.client}</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
           <span style={{ fontFamily: "'Satoshi',sans-serif", fontSize: "0.72rem", letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)", fontVariantNumeric: "tabular-nums" }}>
@@ -287,7 +289,17 @@ const iconBtn: React.CSSProperties = {
 
 /* ═══════════════════════════════════════════════════════ Video rail ══════ */
 
-function ReelCard({ piece, index, onOpen }: { piece: Piece; index: number; onOpen: () => void }) {
+function ReelCard({
+  piece,
+  index,
+  onOpen,
+  compact = false,
+}: {
+  piece: Piece;
+  index: number;
+  onOpen: () => void;
+  compact?: boolean;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const wantPlay = useRef(false);
   const [hover, setHover] = useState(false);
@@ -324,7 +336,8 @@ function ReelCard({ piece, index, onOpen }: { piece: Piece; index: number; onOpe
         position: "relative",
         margin: 0,
         flexShrink: 0,
-        width: "clamp(200px, 21vw, 290px)",
+        width: compact ? "auto" : "clamp(200px, 21vw, 290px)",
+        height: compact ? "clamp(260px, calc(100svh - 15rem), 420px)" : undefined,
         aspectRatio: "9 / 16",
         borderRadius: 3,
         overflow: "hidden",
@@ -409,7 +422,19 @@ function ReelCard({ piece, index, onOpen }: { piece: Piece; index: number; onOpe
   );
 }
 
-export function VideoRail({ pieces, action }: { pieces: Piece[]; action?: React.ReactNode }) {
+export function VideoRail({
+  pieces,
+  action,
+  pinned = false,
+  railWrapperRef,
+  railTrackRef,
+}: {
+  pieces: Piece[];
+  action?: React.ReactNode;
+  pinned?: boolean;
+  railWrapperRef?: RefObject<HTMLDivElement | null>;
+  railTrackRef?: RefObject<HTMLDivElement | null>;
+}) {
   const railRef = useRef<HTMLDivElement>(null);
   const tweenRef = useRef<number | null>(null);
   const [open, setOpen] = useState<number | null>(null);
@@ -490,14 +515,33 @@ export function VideoRail({ pieces, action }: { pieces: Piece[]; action?: React.
         title="Video"
         count={pieces.length}
         blurb="Short-form reels and brand films built for the feed. Hover to preview, click for full screen."
+        compact={pinned}
         action={
+          pinned ? undefined : (
           <div style={{ display: "flex", gap: "0.5rem" }}>
             {arrow(-1, atStart)}
             {arrow(1, atEnd)}
           </div>
+          )
         }
       />
 
+      {pinned ? (
+        <div ref={railWrapperRef} style={{ overflow: "hidden", paddingBottom: 4 }}>
+          <div
+            ref={railTrackRef}
+            style={{
+              display: "flex",
+              gap: "clamp(8px,1vw,14px)",
+              width: "max-content",
+            }}
+          >
+            {pieces.map((piece, i) => (
+              <ReelCard key={piece.src} piece={piece} index={i} onOpen={() => setOpen(i)} compact={pinned} />
+            ))}
+          </div>
+        </div>
+      ) : (
       <div
         ref={railRef}
         className="reel-rail"
@@ -518,10 +562,11 @@ export function VideoRail({ pieces, action }: { pieces: Piece[]; action?: React.
           <ReelCard key={piece.src} piece={piece} index={i} onOpen={() => setOpen(i)} />
         ))}
       </div>
+      )}
 
-      {action && <div style={{ marginTop: "1.75rem" }}>{action}</div>}
+      {action && <div style={{ marginTop: pinned ? "1rem" : "1.75rem" }}>{action}</div>}
 
-      {open !== null && <Lightbox pieces={pieces} index={open} onClose={() => setOpen(null)} onIndex={setOpen} />}
+      {open !== null && <PortfolioLightbox pieces={pieces} index={open} onClose={() => setOpen(null)} onIndex={setOpen} />}
     </>
   );
 }
@@ -594,7 +639,7 @@ export function GraphicGrid({ pieces, action }: { pieces: Piece[]; action?: Reac
 
       {action && <div style={{ marginTop: "1.75rem" }}>{action}</div>}
 
-      {open !== null && <Lightbox pieces={pieces} index={open} onClose={() => setOpen(null)} onIndex={setOpen} />}
+      {open !== null && <PortfolioLightbox pieces={pieces} index={open} onClose={() => setOpen(null)} onIndex={setOpen} />}
     </>
   );
 }

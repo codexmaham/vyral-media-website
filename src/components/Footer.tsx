@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { scrollToSection } from "@/lib/scroll-to";
 
 const footerLinks = {
   Services: [
@@ -47,7 +48,7 @@ export default function Footer() {
             </h2>
             <a
               href="#contact"
-              onClick={(e) => { e.preventDefault(); document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" }); }}
+              onClick={(e) => { e.preventDefault(); scrollToSection("#contact"); }}
               style={{
                 flexShrink: 0,
                 display: "inline-flex",

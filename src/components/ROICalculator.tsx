@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { scrollToSection } from "@/lib/scroll-to";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -142,7 +143,7 @@ export default function ROICalculator() {
 
             <a
               href="#contact"
-              onClick={(e) => { e.preventDefault(); document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" }); }}
+              onClick={(e) => { e.preventDefault(); scrollToSection("#contact"); }}
               className="mt-8 inline-flex items-center justify-center gap-2 bg-white font-['Satoshi'] font-bold px-6 py-4 rounded-full transition-colors duration-300"
               style={{ color: "#1D6FF2" }}
               onMouseEnter={(e) => { const el = e.currentTarget; el.style.backgroundColor = "#0B0B0B"; el.style.color = "#ffffff"; }}

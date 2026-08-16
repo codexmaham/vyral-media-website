@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
-import StickyBookCTA from "@/components/StickyBookCTA";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ScrollProgress from "@/components/ScrollProgress";
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
-
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Vyral Media | We Build Brands People Remember",
@@ -36,9 +32,10 @@ export default function RootLayout({
       <body>
         <SmoothScrollProvider>
           <ScrollProgress />
-          <Navigation />
-          <main>{children}</main>
-          <StickyBookCTA />
+          <div className="relative">
+            <Navigation />
+            <main>{children}</main>
+          </div>
           <WhatsAppButton />
         </SmoothScrollProvider>
       </body>

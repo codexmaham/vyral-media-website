@@ -56,9 +56,9 @@ export const videos: Piece[] = [
 ];
 
 export const graphics: Piece[] = [
+  gfx("alnoortownsialkot_1757140059_3715482569388094541_54847221192.jpg", "Defence Day", "Al Noor Town"),
   gfx("alnoortownsialkot_1760012700_3739580030373081280_54847221192.jpg", "Fountain View — Residential", "Al Noor Town"),
   gfx("alnoortownsialkot_1760541862_3744018966600225708_54847221192.jpg", "Fountain View — Commercial", "Al Noor Town"),
-  gfx("alnoortownsialkot_1757140059_3715482569388094541_54847221192.jpg", "Defence Day", "Al Noor Town"),
   gfx("alnoortownsialkot_1766624362_3795042668712086294_54847221192.jpg", "Quaid-e-Azam Day", "Al Noor Town"),
   gfx("alnoortownsialkot_1771421315_3835277426406492914_54847221192.jpg", "Silver Prime Extension", "Al Noor Town"),
   gfx("officialvynixo.co_1781704871_3921547138899174291_42014251022.jpg", "Systems That Work Smarter", "Vynixo"),
@@ -86,6 +86,6 @@ export const allPieces: Piece[] = [...videos, ...graphics];
 /** Homepage teaser sets — each medium keeps its own showcase. */
 export const featuredVideos: Piece[] = videos.slice(0, 8);
 export const featuredGraphics: Piece[] = [
-  graphics[0], graphics[5], graphics[12], graphics[16],
-  graphics[1], graphics[6], graphics[13], graphics[17],
+  graphics[1], graphics[5], graphics[12], graphics[16],
+  graphics[2], graphics[6], graphics[13], graphics[17],
 ];
