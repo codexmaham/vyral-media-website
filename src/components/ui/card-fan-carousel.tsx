@@ -76,20 +76,27 @@ export type FanCard = {
 function FanCardMedia({ card, isCenter }: { card: FanCard; isCenter: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  const tryPlay = useCallback(() => {
+    const video = videoRef.current;
+    if (!video || !isCenter) return;
+    video.muted = true;
+    void video.play().catch(() => {});
+  }, [isCenter]);
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !card.videoUrl) return;
 
     if (isCenter) {
       video.currentTime = 0;
-      void video.play().catch(() => {});
+      tryPlay();
     } else {
       video.pause();
     }
-  }, [card.videoUrl, isCenter]);
+  }, [card.videoUrl, isCenter, tryPlay]);
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
+    <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden", pointerEvents: "none" }}>
       {isCenter && card.videoUrl ? (
         <video
           ref={videoRef}
@@ -97,7 +104,11 @@ function FanCardMedia({ card, isCenter }: { card: FanCard; isCenter: boolean }) 
           poster={card.imgUrl}
           muted
           loop
+          playsInline
+          autoPlay
           preload="metadata"
+          onLoadedData={tryPlay}
+          onCanPlay={tryPlay}
           style={{
             position: "absolute",
             inset: 0,
@@ -406,6 +417,7 @@ export default function CardFanCarousel({
                   key={`${card.imgUrl}-${index}`}
                   type="button"
                   className={`fan-card block cursor-pointer border-0 p-0 text-left${isCenter ? " fan-card--center" : ""}`}
+                  style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
                   onClick={() => {
                     pauseAutoplay();
                     card.onClick?.();

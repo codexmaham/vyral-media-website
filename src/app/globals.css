@@ -399,6 +399,8 @@ a {
   position: absolute;
   overflow: clip;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .fan-card--center {

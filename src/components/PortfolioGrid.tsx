@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback, type RefObject } from "react";
+import { useRef, useState, useEffect, useLayoutEffect, useCallback, type RefObject } from "react";
 import Image from "next/image";
 import type { Piece } from "@/data/portfolio";
 
@@ -197,8 +197,20 @@ export function PortfolioLightbox({
   onIndex: (i: number) => void;
 }) {
   const piece = pieces[index];
+  const videoRef = useRef<HTMLVideoElement>(null);
   const prev = useCallback(() => onIndex((index - 1 + pieces.length) % pieces.length), [index, pieces.length, onIndex]);
   const next = useCallback(() => onIndex((index + 1) % pieces.length), [index, pieces.length, onIndex]);
+
+  useLayoutEffect(() => {
+    const video = videoRef.current;
+    if (!video || piece.type !== "video") return;
+
+    video.currentTime = 0;
+    void video.play().catch(() => {
+      video.muted = true;
+      void video.play().catch(() => {});
+    });
+  }, [index, piece.src, piece.type]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -260,7 +272,16 @@ export function PortfolioLightbox({
           style={{ flex: 1, height: "100%", display: "flex", alignItems: "center", justifyContent: "center", animation: "lbRise 360ms cubic-bezier(0.16,1,0.3,1)", minWidth: 0 }}
         >
           {piece.type === "video" ? (
-            <video src={piece.src} poster={piece.poster} controls autoPlay playsInline style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 4 }} />
+            <video
+              ref={videoRef}
+              key={piece.src}
+              src={piece.src}
+              poster={piece.poster}
+              controls
+              playsInline
+              preload="auto"
+              style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: 4, width: "100%" }}
+            />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={piece.src} alt={piece.title} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: 4 }} />
