@@ -7,16 +7,19 @@ export type Piece = {
   poster?: string;
 };
 
-/** Videos are huge (up to 123 MB), so each one ships with a ~40 KB poster
- *  frame generated from it. Cards show the poster; the video itself is only
- *  fetched on hover or in the lightbox. */
-const vid = (file: string, title: string, client: string): Piece => ({
-  src: `/Video Portfolio/${encodeURIComponent(file)}`,
-  poster: `/Video Posters/${encodeURIComponent(file.replace(/\.[^.]+$/, ""))}.jpg`,
-  title,
-  client,
-  type: "video",
-});
+/** Web-compressed H.264 copies live in /public/videos (deployed to Vercel).
+ *  Full-quality sources stay in /public/Video Portfolio (gitignored, ~1.2 GB). */
+const vid = (file: string, title: string, client: string): Piece => {
+  const webFile = file.replace(/\.(mov|mp4|MP4|MOV)$/i, ".mp4");
+  const posterBase = file.replace(/\.[^.]+$/, "");
+  return {
+    src: `/videos/${encodeURIComponent(webFile)}`,
+    poster: `/Video Posters/${encodeURIComponent(posterBase)}.jpg`,
+    title,
+    client,
+    type: "video",
+  };
+};
 
 const gfx = (file: string, title: string, client: string): Piece => ({
   src: `/Graphic Portfolio/${encodeURIComponent(file)}`,
