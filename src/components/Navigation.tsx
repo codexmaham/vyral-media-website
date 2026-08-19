@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
 import { scrollToSection } from "@/lib/scroll-to";
@@ -195,24 +194,13 @@ export default function Navigation() {
           <a
             href="#"
             onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-            className="flex items-center gap-2 z-10"
+            className="flex items-center z-10"
+            aria-label="Vyral Media home"
           >
-            <Image src="/vyral-icon.png" alt="Vyral Media" width={40} height={40} className="object-contain" />
-            <Shuffle
-              text="VYRAL."
-              tag="span"
-              className="font-['Satoshi'] font-black text-lg tracking-[-0.03em] hidden sm:block"
-              style={{ color: "#ffffff" }}
-              shuffleDirection="up"
-              duration={0.4}
-              stagger={0.04}
-              animationMode="evenodd"
-              triggerOnce={false}
-              triggerOnHover={true}
-              threshold={0}
-              rootMargin="0px"
-              textAlign="left"
-            />
+            <div className="vyral-brand-logo-wrap">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/vyral-logo-nav.png" alt="Vyral Media" className="vyral-brand-logo" />
+            </div>
           </a>
 
           {/* Desktop links + active indicator */}

@@ -253,6 +253,28 @@ body {
   cursor: auto;
 }
 
+.vyral-preloader-logo {
+  display: block;
+  width: clamp(220px, 58vw, 420px);
+  height: auto;
+  will-change: transform, opacity;
+}
+
+.vyral-brand-logo-wrap {
+  display: flex;
+  align-items: center;
+  height: clamp(32px, 5vw, 42px);
+  flex-shrink: 0;
+}
+
+.vyral-brand-logo {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: clamp(170px, 32vw, 240px);
+  object-fit: contain;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
